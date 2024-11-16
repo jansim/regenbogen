@@ -43,7 +43,7 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl overflow-auto" style={{ maxHeight: '95vh' }}>
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">{palette.palette}</DialogTitle>
         </DialogHeader>
