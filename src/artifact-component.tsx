@@ -184,7 +184,7 @@ const PaletteDisplay = ({ palettes = defaultPalettes }) => {
           <div className="h-20 flex items-center justify-between">
             <h1 className="text-3xl font-bold">
               Regenbogen
-              <img className="w-12 ml-3 inline-block relative" src="/logo.svg" style={{bottom: '0.12em'}}/>
+              <img className="w-12 ml-3 inline-block relative" src="logo.svg" style={{bottom: '0.12em'}}/>
             </h1>
             <div className="flex gap-4">
               <Input
