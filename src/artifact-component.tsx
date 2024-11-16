@@ -225,9 +225,9 @@ const PaletteDisplay = ({ palettes = defaultPalettes }) => {
               >
                 <CardHeader className="pb-2">
                   <div className="space-y-1">
-                    <h2 className="text-xl font-semibold">{palette.palette}</h2>
+                    <h2 className="text-xl font-semibold relative inline-block bg-white pr-3 z-10">{palette.palette}</h2>
                     <p className="text-sm text-gray-400 absolute top-6 right-6">
-                      {palette.length} colors • {palette.type}
+                    &#123;{palette.package}&#125; • {palette.length} • {palette.type}
                     </p>
                   </div>
                 </CardHeader>
