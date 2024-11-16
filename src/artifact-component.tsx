@@ -152,7 +152,9 @@ const PaletteDisplay = () => {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const handlePaletteSelect = (palette) => {
+  const handlePaletteSelect = (e, palette) => {
+    e.preventDefault();
+
     setSelectedPalette(palette);
     // Update URL without reload
     const url = new URL(window.location.href);
@@ -215,32 +217,32 @@ const PaletteDisplay = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           {filteredPalettes.map((palette) => (
-            <Card
-              key={palette.id}
-              className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => handlePaletteSelect(palette)}
-            >
-              <CardHeader className="pb-2">
-                <div className="space-y-1">
-                  <h2 className="text-xl font-semibold">{palette.palette}</h2>
-                  <p className="text-sm text-gray-500">
-                    {palette.type} • {palette.length} colors
-                  </p>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex h-12 rounded-md overflow-hidden">
-                  {palette.colors.map((color, index) => (
-                    <div
-                      key={`${palette.id}-${index}`}
-                      className="flex-1 h-full"
-                      style={{ backgroundColor: color }}
-                      title={color}
-                    />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <a onClick={(e) => handlePaletteSelect(e, palette)} key={palette.id} href={`?palette=${palette.id}`}>
+              <Card
+                className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+              >
+                <CardHeader className="pb-2">
+                  <div className="space-y-1">
+                    <h2 className="text-xl font-semibold">{palette.palette}</h2>
+                    <p className="text-sm text-gray-500">
+                      {palette.type} • {palette.length} colors
+                    </p>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex h-12 rounded-md overflow-hidden">
+                    {palette.colors.map((color, index) => (
+                      <div
+                        key={`${palette.id}-${index}`}
+                        className="flex-1 h-full"
+                        style={{ backgroundColor: color }}
+                        title={color}
+                      />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </a>
           ))}
         </div>
 
