@@ -221,13 +221,13 @@ const PaletteDisplay = ({ palettes = defaultPalettes }) => {
           {filteredPalettes.map((palette) => (
             <a onClick={(e) => handlePaletteSelect(e, palette)} key={palette.id} href={`?palette=${palette.id}`}>
               <Card
-                className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow relative"
               >
                 <CardHeader className="pb-2">
                   <div className="space-y-1">
                     <h2 className="text-xl font-semibold">{palette.palette}</h2>
-                    <p className="text-sm text-gray-500">
-                      {palette.type} • {palette.length} colors
+                    <p className="text-sm text-gray-400 absolute top-6 right-6">
+                      {palette.length} colors • {palette.type}
                     </p>
                   </div>
                 </CardHeader>
