@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Check, Copy, X } from 'lucide-react';
+import { Check, Copy, Link } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const palettes = [
@@ -16,10 +16,10 @@ const palettes = [
   {"package":"awtools","palette":"spalette","length":6,"type":"qualitative","id":"awtools::spalette","colors":["#9F248FFF","#FFCE4EFF","#017A4AFF","#F9791EFF","#244579FF","#C6242DFF"]}
 ];
 
-// PaletteDetailDialog component remains unchanged
 const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [showCopiedAll, setShowCopiedAll] = useState(false);
+  const [showCopiedLink, setShowCopiedLink] = useState(false);
 
   const copyToClipboard = async (text, index = null) => {
     try {
@@ -41,6 +41,18 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
     copyToClipboard(colorsList);
   };
 
+  const copyPaletteLink = async () => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('palette', palette.id);
+    try {
+      await navigator.clipboard.writeText(url.toString());
+      setShowCopiedLink(true);
+      setTimeout(() => setShowCopiedLink(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl">
@@ -55,14 +67,24 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
                 {palette.type} • {palette.length} colors
               </p>
             </div>
-            <Button
-              variant="outline"
-              onClick={copyAllColors}
-              className="flex items-center gap-2"
-            >
-              {showCopiedAll ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              Copy All
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={copyPaletteLink}
+                className="flex items-center gap-2"
+              >
+                {showCopiedLink ? <Check className="w-4 h-4" /> : <Link className="w-4 h-4" />}
+                {showCopiedLink ? 'Copied!' : 'Copy Link'}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={copyAllColors}
+                className="flex items-center gap-2"
+              >
+                {showCopiedAll ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                Copy All
+              </Button>
+            </div>
           </div>
 
           <div className="flex h-16 rounded-md overflow-hidden">
@@ -105,10 +127,10 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
             ))}
           </div>
 
-          {showCopiedAll && (
+          {(showCopiedAll || showCopiedLink) && (
             <Alert className="bg-green-50 text-green-700 border-green-200">
               <AlertDescription>
-                All colors copied to clipboard!
+                {showCopiedAll ? 'All colors copied to clipboard!' : 'Link copied to clipboard!'}
               </AlertDescription>
             </Alert>
           )}
@@ -123,6 +145,49 @@ const PaletteDisplay = () => {
   const [selectedType, setSelectedType] = useState('all');
   const [selectedPalette, setSelectedPalette] = useState(null);
 
+  useEffect(() => {
+    // Check URL for palette parameter on mount
+    const params = new URLSearchParams(window.location.search);
+    const paletteId = params.get('palette');
+    if (paletteId) {
+      const palette = palettes.find(p => p.id === paletteId);
+      if (palette) {
+        setSelectedPalette(palette);
+      }
+    }
+
+    // Listen for browser back/forward navigation
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const paletteId = params.get('palette');
+      if (paletteId) {
+        const palette = palettes.find(p => p.id === paletteId);
+        setSelectedPalette(palette);
+      } else {
+        setSelectedPalette(null);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const handlePaletteSelect = (palette) => {
+    setSelectedPalette(palette);
+    // Update URL without reload
+    const url = new URL(window.location.href);
+    url.searchParams.set('palette', palette.id);
+    window.history.pushState({}, '', url);
+  };
+
+  const handlePaletteClose = () => {
+    setSelectedPalette(null);
+    // Remove palette parameter from URL
+    const url = new URL(window.location.href);
+    url.searchParams.delete('palette');
+    window.history.pushState({}, '', url);
+  };
+
   const paletteTypes = ['all', ...new Set(palettes.map(p => p.type))];
 
   const filteredPalettes = palettes.filter(palette => {
@@ -133,14 +198,10 @@ const PaletteDisplay = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Fixed Header */}
       <div className="fixed top-0 left-0 right-0 bg-white border-b z-10 shadow-sm">
         <div className="max-w-7xl mx-auto px-6">
           <div className="h-20 flex items-center justify-between">
-            {/* Title */}
             <h1 className="text-3xl font-bold">Color Palettes</h1>
-
-            {/* Filter Controls */}
             <div className="flex gap-4">
               <Input
                 placeholder="Search palettes..."
@@ -165,23 +226,19 @@ const PaletteDisplay = () => {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6">
-        {/* Spacer to account for fixed header */}
         <div className="h-24" />
 
-        {/* Results Count */}
         <p className="text-sm text-gray-500 mb-4">
           Showing {filteredPalettes.length} of {palettes.length} palettes
         </p>
 
-        {/* Palettes Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           {filteredPalettes.map((palette) => (
             <Card
               key={palette.id}
               className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => setSelectedPalette(palette)}
+              onClick={() => handlePaletteSelect(palette)}
             >
               <CardHeader className="pb-2">
                 <div className="space-y-1">
@@ -207,19 +264,17 @@ const PaletteDisplay = () => {
           ))}
         </div>
 
-        {/* No Results Message */}
         {filteredPalettes.length === 0 && (
           <div className="text-center py-12 text-gray-500">
             No palettes found matching your criteria
           </div>
         )}
 
-        {/* Palette Detail Dialog */}
         {selectedPalette && (
           <PaletteDetailDialog
             palette={selectedPalette}
             isOpen={!!selectedPalette}
-            onClose={() => setSelectedPalette(null)}
+            onClose={handlePaletteClose}
           />
         )}
       </div>
