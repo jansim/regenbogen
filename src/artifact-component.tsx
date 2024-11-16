@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Check, Copy, Link } from 'lucide-react';
+import { Check, Copy } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const palettes = [
@@ -19,7 +19,6 @@ const palettes = [
 const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [showCopiedAll, setShowCopiedAll] = useState(false);
-  const [showCopiedLink, setShowCopiedLink] = useState(false);
 
   const copyToClipboard = async (text, index = null) => {
     try {
@@ -107,10 +106,10 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
             ))}
           </div>
 
-          {(showCopiedAll || showCopiedLink) && (
+          {(showCopiedAll) && (
             <Alert className="bg-green-50 text-green-700 border-green-200">
               <AlertDescription>
-                {showCopiedAll ? 'All colors copied to clipboard!' : 'Link copied to clipboard!'}
+                {'All colors copied to clipboard!'}
               </AlertDescription>
             </Alert>
           )}
@@ -123,7 +122,7 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
 const PaletteDisplay = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
-  const [selectedPalette, setSelectedPalette] = useState(null);
+  const [selectedPalette, setSelectedPalette] = useState<any>(null);
 
   useEffect(() => {
     // Check URL for palette parameter on mount
@@ -183,7 +182,10 @@ const PaletteDisplay = () => {
       <div className="fixed top-0 left-0 right-0 bg-white border-b z-10 shadow-sm">
         <div className="max-w-7xl mx-auto px-6">
           <div className="h-20 flex items-center justify-between">
-            <h1 className="text-3xl font-bold">Color Palettes</h1>
+            <h1 className="text-3xl font-bold">
+              Regenbogen
+              <img className="w-12 ml-3 inline-block relative" src="/logo.svg" style={{bottom: '0.12em'}}/>
+            </h1>
             <div className="flex gap-4">
               <Input
                 placeholder="Search palettes..."
