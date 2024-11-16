@@ -1,120 +1,230 @@
 import React, { useState } from 'react';
-import { AlertCircle, Mail, Lock, User, Github, Facebook, Twitter } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Check, Copy, X } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
-const LoginForm = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [website, setWebsite] = useState('');
-  const [error, setError] = useState('');
+const palettes = [
+  {"package":"awtools","palette":"a_palette","length":8,"type":"sequential","id":"awtools::a_palette","colors":["#2A363BFF","#019875FF","#99B898FF","#FECEA8FF","#FF847CFF","#E84A5FFF","#C0392BFF","#96281BFF"]},
+  {"package":"awtools","palette":"ppalette","length":8,"type":"qualitative","id":"awtools::ppalette","colors":["#F7DC05FF","#3D98D3FF","#EC0B88FF","#5E35B1FF","#F9791EFF","#3DD378FF","#C6C6C6FF","#444444FF"]},
+  {"package":"awtools","palette":"bpalette","length":16,"type":"qualitative","id":"awtools::bpalette","colors":["#C62828FF","#F44336FF","#9C27B0FF","#673AB7FF","#3F51B5FF","#2196F3FF","#29B6F6FF","#006064FF","#009688FF","#4CAF50FF","#8BC34AFF","#FFEB3BFF","#FF9800FF","#795548FF","#9E9E9EFF","#607D8BFF"]},
+  {"package":"awtools","palette":"gpalette","length":4,"type":"sequential","id":"awtools::gpalette","colors":["#D6D6D6FF","#ADADADFF","#707070FF","#333333FF"]},
+  {"package":"awtools","palette":"mpalette","length":9,"type":"qualitative","id":"awtools::mpalette","colors":["#017A4AFF","#FFCE4EFF","#3D98D3FF","#FF363CFF","#7559A2FF","#794924FF","#8CDB5EFF","#D6D6D6FF","#FB8C00FF"]},
+  {"package":"awtools","palette":"spalette","length":6,"type":"qualitative","id":"awtools::spalette","colors":["#9F248FFF","#FFCE4EFF","#017A4AFF","#F9791EFF","#244579FF","#C6242DFF"]}
+];
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    if (!email || !password || !website) {
-      setError('Please fill in all fields');
-    } else {
-      setError('');
-      console.log('Login attempted:', { email, password, website });
-      // Here you would typically handle the login logic
-      alert(`Login attempted: ${email}, ${password}, ${website}`);
+// PaletteDetailDialog component remains unchanged
+const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
+  const [copiedIndex, setCopiedIndex] = useState(null);
+  const [showCopiedAll, setShowCopiedAll] = useState(false);
+
+  const copyToClipboard = async (text, index = null) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      if (index !== null) {
+        setCopiedIndex(index);
+        setTimeout(() => setCopiedIndex(null), 2000);
+      } else {
+        setShowCopiedAll(true);
+        setTimeout(() => setShowCopiedAll(false), 2000);
+      }
+    } catch (err) {
+      console.error('Failed to copy:', err);
     }
   };
 
-  const handleSocialLogin = (platform) => {
-    console.log(`${platform} login attempted`);
-    // Here you would typically handle the social login logic
-    alert(`${platform} login attempted`);
+  const copyAllColors = () => {
+    const colorsList = palette.colors.join(', ');
+    copyToClipboard(colorsList);
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">Demo Component</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                icon={<Mail className="h-4 w-4 text-gray-500" />}
-              />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold">{palette.palette}</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">
+                {palette.type} • {palette.length} colors
+              </p>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                icon={<Lock className="h-4 w-4 text-gray-500" />}
+            <Button
+              variant="outline"
+              onClick={copyAllColors}
+              className="flex items-center gap-2"
+            >
+              {showCopiedAll ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              Copy All
+            </Button>
+          </div>
+
+          <div className="flex h-16 rounded-md overflow-hidden">
+            {palette.colors.map((color, index) => (
+              <div
+                key={`preview-${index}`}
+                className="flex-1 h-full"
+                style={{ backgroundColor: color }}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="website">Target Website</Label>
-              <Select onValueChange={setWebsite}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a website" />
+            ))}
+          </div>
+
+          <div className="space-y-2">
+            {palette.colors.map((color, index) => (
+              <div
+                key={`color-${index}`}
+                className="flex items-center p-2 rounded-lg hover:bg-gray-50"
+              >
+                <div
+                  className="w-12 h-12 rounded-md mr-4"
+                  style={{ backgroundColor: color }}
+                />
+                <span className="flex-1 font-mono">{color}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => copyToClipboard(color, index)}
+                  className="w-24"
+                >
+                  {copiedIndex === index ? (
+                    <Check className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
+                  <span className="ml-2">
+                    {copiedIndex === index ? 'Copied!' : 'Copy'}
+                  </span>
+                </Button>
+              </div>
+            ))}
+          </div>
+
+          {showCopiedAll && (
+            <Alert className="bg-green-50 text-green-700 border-green-200">
+              <AlertDescription>
+                All colors copied to clipboard!
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const PaletteDisplay = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedType, setSelectedType] = useState('all');
+  const [selectedPalette, setSelectedPalette] = useState(null);
+
+  const paletteTypes = ['all', ...new Set(palettes.map(p => p.type))];
+
+  const filteredPalettes = palettes.filter(palette => {
+    const matchesSearch = palette.palette.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = selectedType === 'all' || palette.type === selectedType;
+    return matchesSearch && matchesType;
+  });
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Fixed Header */}
+      <div className="fixed top-0 left-0 right-0 bg-white border-b z-10 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="h-20 flex items-center justify-between">
+            {/* Title */}
+            <h1 className="text-3xl font-bold">Color Palettes</h1>
+
+            {/* Filter Controls */}
+            <div className="flex gap-4">
+              <Input
+                placeholder="Search palettes..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-64"
+              />
+              <Select value={selectedType} onValueChange={setSelectedType}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="website1">Website 1</SelectItem>
-                  <SelectItem value="website2">Website 2</SelectItem>
-                  <SelectItem value="website3">Website 3</SelectItem>
+                  {paletteTypes.map(type => (
+                    <SelectItem key={type} value={type}>
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit" className="w-full">Log In</Button>
-          </form>
-
-          {error && (
-            <Alert variant="destructive" className="mt-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          <div className="relative mt-6">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-            </div>
           </div>
+        </div>
+      </div>
 
-          <div className="flex space-x-4 mt-6">
-            <Button variant="outline" className="w-full" onClick={() => handleSocialLogin('Github')}>
-              <Github className="mr-2 h-4 w-4" /> Github
-            </Button>
-            <Button variant="outline" className="w-full" onClick={() => handleSocialLogin('Facebook')}>
-              <Facebook className="mr-2 h-4 w-4" /> Facebook
-            </Button>
-            <Button variant="outline" className="w-full" onClick={() => handleSocialLogin('Twitter')}>
-              <Twitter className="mr-2 h-4 w-4" /> Twitter
-            </Button>
-          </div>
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Spacer to account for fixed header */}
+        <div className="h-24" />
 
-          <div className="text-center text-sm mt-6">
-            Don't have an account?{' '}
-            <Button variant="link" className="p-0">
-              Sign up
-            </Button>
+        {/* Results Count */}
+        <p className="text-sm text-gray-500 mb-4">
+          Showing {filteredPalettes.length} of {palettes.length} palettes
+        </p>
+
+        {/* Palettes Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          {filteredPalettes.map((palette) => (
+            <Card
+              key={palette.id}
+              className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => setSelectedPalette(palette)}
+            >
+              <CardHeader className="pb-2">
+                <div className="space-y-1">
+                  <h2 className="text-xl font-semibold">{palette.palette}</h2>
+                  <p className="text-sm text-gray-500">
+                    {palette.type} • {palette.length} colors
+                  </p>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex h-12 rounded-md overflow-hidden">
+                  {palette.colors.map((color, index) => (
+                    <div
+                      key={`${palette.id}-${index}`}
+                      className="flex-1 h-full"
+                      style={{ backgroundColor: color }}
+                      title={color}
+                    />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* No Results Message */}
+        {filteredPalettes.length === 0 && (
+          <div className="text-center py-12 text-gray-500">
+            No palettes found matching your criteria
           </div>
-        </CardContent>
-      </Card>
+        )}
+
+        {/* Palette Detail Dialog */}
+        {selectedPalette && (
+          <PaletteDetailDialog
+            palette={selectedPalette}
+            isOpen={!!selectedPalette}
+            onClose={() => setSelectedPalette(null)}
+          />
+        )}
+      </div>
     </div>
   );
 };
 
-export default LoginForm;
+export default PaletteDisplay;
