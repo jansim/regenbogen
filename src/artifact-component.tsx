@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Check, Copy } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
-const palettes = [
+const defaultPalettes = [
   {"package":"awtools","palette":"a_palette","length":8,"type":"sequential","id":"awtools::a_palette","colors":["#2A363BFF","#019875FF","#99B898FF","#FECEA8FF","#FF847CFF","#E84A5FFF","#C0392BFF","#96281BFF"]},
   {"package":"awtools","palette":"ppalette","length":8,"type":"qualitative","id":"awtools::ppalette","colors":["#F7DC05FF","#3D98D3FF","#EC0B88FF","#5E35B1FF","#F9791EFF","#3DD378FF","#C6C6C6FF","#444444FF"]},
   {"package":"awtools","palette":"bpalette","length":16,"type":"qualitative","id":"awtools::bpalette","colors":["#C62828FF","#F44336FF","#9C27B0FF","#673AB7FF","#3F51B5FF","#2196F3FF","#29B6F6FF","#006064FF","#009688FF","#4CAF50FF","#8BC34AFF","#FFEB3BFF","#FF9800FF","#795548FF","#9E9E9EFF","#607D8BFF"]},
@@ -119,7 +119,7 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
   );
 };
 
-const PaletteDisplay = () => {
+const PaletteDisplay = ({ palettes = defaultPalettes }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedPalette, setSelectedPalette] = useState<any>(null);
