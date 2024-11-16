@@ -1,7 +1,6 @@
 library(tidyverse)
 
 palettes_d <- paletteer::palettes_d_names %>%
-  head() %>%
   select(-novelty) %>%
   mutate(
     id = paste0(package, "::", palette)
@@ -14,9 +13,7 @@ palettes_d <- paletteer::palettes_d_names %>%
   )
 palettes_d %>%
   jsonlite::write_json("src/data/palettes_d.json")
-
-
-paletteer_d
+palettes_d
 
 # TODO: Add these as well
 # paletteer::palettes_c_names
