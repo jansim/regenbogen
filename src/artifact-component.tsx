@@ -41,18 +41,6 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
     copyToClipboard(colorsList);
   };
 
-  const copyPaletteLink = async () => {
-    const url = new URL(window.location.href);
-    url.searchParams.set('palette', palette.id);
-    try {
-      await navigator.clipboard.writeText(url.toString());
-      setShowCopiedLink(true);
-      setTimeout(() => setShowCopiedLink(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy link:', err);
-    }
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl">
@@ -68,14 +56,6 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
               </p>
             </div>
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={copyPaletteLink}
-                className="flex items-center gap-2"
-              >
-                {showCopiedLink ? <Check className="w-4 h-4" /> : <Link className="w-4 h-4" />}
-                {showCopiedLink ? 'Copied!' : 'Copy Link'}
-              </Button>
               <Button
                 variant="outline"
                 onClick={copyAllColors}
