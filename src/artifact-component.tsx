@@ -56,7 +56,7 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-sm text-gray-500">
-                {palette.type} • {palette.length} colors
+              &#123;{palette.package}&#125; • {palette.length} colors • {palette.type}
               </p>
             </div>
             <div className="flex gap-2">
