@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Check, Copy } from 'lucide-react';
+import { Check, Copy, ChevronRight } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const defaultPalettes = [
@@ -19,11 +19,16 @@ const defaultPalettes = [
 const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [showCopiedAll, setShowCopiedAll] = useState(false);
+  const [isListExpanded, setIsListExpanded] = useState(true);
+  const [copiedPreviewIndex, setCopiedPreviewIndex] = useState(null);
 
-  const copyToClipboard = async (text, index = null) => {
+  const copyToClipboard = async (text, index = null, isPreview = false) => {
     try {
       await navigator.clipboard.writeText(text);
-      if (index !== null) {
+      if (isPreview) {
+        setCopiedPreviewIndex(index);
+        setTimeout(() => setCopiedPreviewIndex(null), 2000);
+      } else if (index !== null) {
         setCopiedIndex(index);
         setTimeout(() => setCopiedIndex(null), 2000);
       } else {
@@ -66,44 +71,69 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
             </div>
           </div>
 
-          <div className="flex h-16 rounded-md overflow-hidden">
+          <div className="flex h-16 rounded-md overflow-hidden relative">
             {palette.colors.map((color, index) => (
               <div
                 key={`preview-${index}`}
-                className="flex-1 h-full"
+                className="flex-1 h-full relative group cursor-pointer hover:z-10 transition-transform hover:scale-105 hover:shadow-lg"
                 style={{ backgroundColor: color }}
-              />
+                onClick={() => copyToClipboard(color, index, true)}
+                title={`Click to copy ${color}`}
+              >
+                {copiedPreviewIndex === index && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white">
+                    <Check className="w-6 h-6" />
+                  </div>
+                )}
+                <div className="opacity-0 group-hover:opacity-100 absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 text-white transition-opacity">
+                  <Copy className="w-4 h-4" />
+                </div>
+              </div>
             ))}
           </div>
 
-          <div className="space-y-2">
-            {palette.colors.map((color, index) => (
-              <div
-                key={`color-${index}`}
-                className="flex items-center p-2 rounded-lg hover:bg-gray-50"
-              >
+          <div>
+            <button
+              onClick={() => setIsListExpanded(!isListExpanded)}
+              className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-2 group"
+            >
+              <ChevronRight
+                className={`w-4 h-4 transition-transform ${isListExpanded ? 'rotate-90' : ''}`}
+              />
+              <span>
+                {isListExpanded ? 'Hide' : 'Show'} color details
+              </span>
+            </button>
+
+            <div className={`space-y-2 transition-all ${isListExpanded ? 'block' : 'hidden'}`}>
+              {palette.colors.map((color, index) => (
                 <div
-                  className="w-12 h-12 rounded-md mr-4"
-                  style={{ backgroundColor: color }}
-                />
-                <span className="flex-1 font-mono">{color}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => copyToClipboard(color, index)}
-                  className="w-24"
+                  key={`color-${index}`}
+                  className="flex items-center p-2 rounded-lg hover:bg-gray-50"
                 >
-                  {copiedIndex === index ? (
-                    <Check className="w-4 h-4 text-green-500" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
-                  <span className="ml-2">
-                    {copiedIndex === index ? 'Copied!' : 'Copy'}
-                  </span>
-                </Button>
-              </div>
-            ))}
+                  <div
+                    className="w-12 h-12 rounded-md mr-4"
+                    style={{ backgroundColor: color }}
+                  />
+                  <span className="flex-1 font-mono">{color}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard(color, index)}
+                    className="w-24"
+                  >
+                    {copiedIndex === index ? (
+                      <Check className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                    <span className="ml-2">
+                      {copiedIndex === index ? 'Copied!' : 'Copy'}
+                    </span>
+                  </Button>
+                </div>
+              ))}
+            </div>
           </div>
 
           {(showCopiedAll) && (
