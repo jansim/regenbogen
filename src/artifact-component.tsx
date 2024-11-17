@@ -19,7 +19,7 @@ const defaultPalettes = [
 const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [showCopiedAll, setShowCopiedAll] = useState(false);
-  const [isListExpanded, setIsListExpanded] = useState(true);
+  const [isListExpanded, setIsListExpanded] = useState(false);
   const [copiedPreviewIndex, setCopiedPreviewIndex] = useState(null);
 
   const copyToClipboard = async (text, index = null, isPreview = false) => {
@@ -27,13 +27,13 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
       await navigator.clipboard.writeText(text);
       if (isPreview) {
         setCopiedPreviewIndex(index);
-        setTimeout(() => setCopiedPreviewIndex(null), 2000);
+        setTimeout(() => setCopiedPreviewIndex(null), 1000);
       } else if (index !== null) {
         setCopiedIndex(index);
-        setTimeout(() => setCopiedIndex(null), 2000);
+        setTimeout(() => setCopiedIndex(null), 1000);
       } else {
         setShowCopiedAll(true);
-        setTimeout(() => setShowCopiedAll(false), 2000);
+        setTimeout(() => setShowCopiedAll(false), 1000);
       }
     } catch (err) {
       console.error('Failed to copy:', err);
@@ -75,19 +75,20 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
             {palette.colors.map((color, index) => (
               <div
                 key={`preview-${index}`}
-                className="flex-1 h-full relative group cursor-pointer hover:z-10 transition-transform hover:scale-105 hover:shadow-lg"
+                className="flex-1 h-full relative group cursor-pointer hover:z-10 transition-transform"
                 style={{ backgroundColor: color }}
                 onClick={() => copyToClipboard(color, index, true)}
                 title={`Click to copy ${color}`}
               >
-                {copiedPreviewIndex === index && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white">
+                {copiedPreviewIndex === index ? (
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 text-white">
                     <Check className="w-6 h-6" />
                   </div>
-                )}
+                ) : (
                 <div className="opacity-0 group-hover:opacity-100 absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 text-white transition-opacity">
                   <Copy className="w-4 h-4" />
                 </div>
+                )}
               </div>
             ))}
           </div>
