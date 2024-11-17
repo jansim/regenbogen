@@ -6,21 +6,107 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Check, Copy, ChevronRight } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 const defaultPalettes = [
-  {"package":"awtools","palette":"a_palette","length":8,"type":"sequential","id":"awtools::a_palette","colors":["#2A363BFF","#019875FF","#99B898FF","#FECEA8FF","#FF847CFF","#E84A5FFF","#C0392BFF","#96281BFF"]},
-  {"package":"awtools","palette":"ppalette","length":8,"type":"qualitative","id":"awtools::ppalette","colors":["#F7DC05FF","#3D98D3FF","#EC0B88FF","#5E35B1FF","#F9791EFF","#3DD378FF","#C6C6C6FF","#444444FF"]},
-  {"package":"awtools","palette":"bpalette","length":16,"type":"qualitative","id":"awtools::bpalette","colors":["#C62828FF","#F44336FF","#9C27B0FF","#673AB7FF","#3F51B5FF","#2196F3FF","#29B6F6FF","#006064FF","#009688FF","#4CAF50FF","#8BC34AFF","#FFEB3BFF","#FF9800FF","#795548FF","#9E9E9EFF","#607D8BFF"]},
-  {"package":"awtools","palette":"gpalette","length":4,"type":"sequential","id":"awtools::gpalette","colors":["#D6D6D6FF","#ADADADFF","#707070FF","#333333FF"]},
-  {"package":"awtools","palette":"mpalette","length":9,"type":"qualitative","id":"awtools::mpalette","colors":["#017A4AFF","#FFCE4EFF","#3D98D3FF","#FF363CFF","#7559A2FF","#794924FF","#8CDB5EFF","#D6D6D6FF","#FB8C00FF"]},
-  {"package":"awtools","palette":"spalette","length":6,"type":"qualitative","id":"awtools::spalette","colors":["#9F248FFF","#FFCE4EFF","#017A4AFF","#F9791EFF","#244579FF","#C6242DFF"]}
+  {"package":"awtools","palette":"a_palette","length":8,"type":"sequential","id":"awtools::a_palette","colors":["#2A363B","#019875","#99B898","#FECEA8","#FF847C","#E84A5F","#C0392B","#96281B"]},
+  {"package":"awtools","palette":"ppalette","length":8,"type":"qualitative","id":"awtools::ppalette","colors":["#F7DC05","#3D98D3","#EC0B88","#5E35B1","#F9791E","#3DD378","#C6C6C6","#444444"]},
+  {"package":"awtools","palette":"bpalette","length":16,"type":"qualitative","id":"awtools::bpalette","colors":["#C62828","#F44336","#9C27B0","#673AB7","#3F51B5","#2196F3","#29B6F6","#006064","#009688","#4CAF50","#8BC34A","#FFEB3B","#FF9800","#795548","#9E9E9E","#607D8B"]},
+  {"package":"awtools","palette":"gpalette","length":4,"type":"sequential","id":"awtools::gpalette","colors":["#D6D6D6","#ADADAD","#707070","#333333"]},
+  {"package":"awtools","palette":"mpalette","length":9,"type":"qualitative","id":"awtools::mpalette","colors":["#017A4A","#FFCE4E","#3D98D3","#FF363C","#7559A2","#794924","#8CDB5E","#D6D6D6","#FB8C00"]},
+  {"package":"awtools","palette":"spalette","length":6,"type":"qualitative","id":"awtools::spalette","colors":["#9F248F","#FFCE4E","#017A4A","#F9791E","#244579","#C6242D"]}
 ];
+
+// Color blindness simulation matrices
+const colorblindnessTypes = {
+  protanopia: [
+    0.567, 0.433, 0, 0, 0,
+    0.558, 0.442, 0, 0, 0,
+    0, 0.242, 0.758, 0, 0,
+    0, 0, 0, 1, 0
+  ],
+  deuteranopia: [
+    0.625, 0.375, 0, 0, 0,
+    0.7, 0.3, 0, 0, 0,
+    0, 0.3, 0.7, 0, 0,
+    0, 0, 0, 1, 0
+  ],
+  tritanopia: [
+    0.95, 0.05, 0, 0, 0,
+    0, 0.433, 0.567, 0, 0,
+    0, 0.475, 0.525, 0, 0,
+    0, 0, 0, 1, 0
+  ],
+  achromatopsia: [
+    0.299, 0.587, 0.114, 0, 0,
+    0.299, 0.587, 0.114, 0, 0,
+    0.299, 0.587, 0.114, 0, 0,
+    0, 0, 0, 1, 0
+  ]
+};
+
+const hexToRgb = (hex, float = true) => {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+
+  if (float) {
+    return [r / 255, g / 255, b / 255];
+  } else {
+    return [r, g, b];
+  }
+}
+
+
+const simulateColorBlindness = (color, type) => {
+  if (!colorblindnessTypes[type]) {
+    throw new Error(`Invalid color blindness type: ${type}`);
+  }
+
+  // Convert hex to RGB
+  const [r, g, b] = hexToRgb(color);
+
+  const matrix = colorblindnessTypes[type];
+
+  // Apply color transformation
+  const newR = matrix[0] * r + matrix[1] * g + matrix[2] * b + matrix[3];
+  const newG = matrix[5] * r + matrix[6] * g + matrix[7] * b + matrix[8];
+  const newB = matrix[10] * r + matrix[11] * g + matrix[12] * b + matrix[13];
+
+  // Convert back to hex
+  const toHex = (n) => {
+    const intVal = Math.round(Math.max(0, Math.min(1, n)) * 255); // Clamp and scale
+    return intVal.toString(16).padStart(2, '0');
+  };
+
+  return `#${toHex(newR)}${toHex(newG)}${toHex(newB)}`;
+};
+
+const ColorblindPreview = ({ colors, type }) => {
+  const simulatedColors = colors.map(color => simulateColorBlindness(color, type));
+
+  return (
+    <div className="space-y-2">
+      <div className="flex h-16 rounded-md overflow-hidden">
+        {simulatedColors.map((color, index) => (
+          <div
+            key={index}
+            className="flex-1 h-full"
+            style={{ backgroundColor: color }}
+            title={`Original: ${colors[index]}\nSimulated: ${color}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [showCopiedAll, setShowCopiedAll] = useState(false);
   const [isListExpanded, setIsListExpanded] = useState(false);
   const [copiedPreviewIndex, setCopiedPreviewIndex] = useState(null);
+  const [selectedView, setSelectedView] = useState('normal');
 
   const copyToClipboard = async (text, index = null, isPreview = false) => {
     try {
@@ -56,7 +142,7 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-sm text-gray-500">
-              &#123;{palette.package}&#125; • {palette.length} colors • {palette.type}
+                &#123;{palette.package}&#125; • {palette.length} colors • {palette.type}
               </p>
             </div>
             <div className="flex gap-2">
@@ -70,6 +156,7 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
               </Button>
             </div>
           </div>
+
 
           <div className="flex h-16 rounded-md overflow-hidden relative">
             {palette.colors.map((color, index) => (
@@ -85,9 +172,9 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
                     <Check className="w-6 h-6" />
                   </div>
                 ) : (
-                <div className="opacity-0 group-hover:opacity-100 absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 text-white transition-opacity">
-                  <Copy className="w-4 h-4" />
-                </div>
+                  <div className="opacity-0 group-hover:opacity-100 absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 text-white transition-opacity">
+                    <Copy className="w-4 h-4" />
+                  </div>
                 )}
               </div>
             ))}
@@ -112,11 +199,18 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
                   key={`color-${index}`}
                   className="flex items-center p-2 rounded-lg hover:bg-gray-50"
                 >
-                  <div
-                    className="w-12 h-12 rounded-md mr-4"
-                    style={{ backgroundColor: color }}
-                  />
-                  <span className="flex-1 font-mono">{color}</span>
+                  <div className="flex gap-2 flex-1">
+                    <div
+                      className="w-12 h-12 rounded-md"
+                      style={{ backgroundColor: color }}
+                    />
+                    <div className="flex flex-col justify-center">
+                      <span className="font-mono">{color}</span>
+                      <span className="font-mono text-sm text-gray-500">
+                        rgb({hexToRgb(color, false).join(', ')})
+                      </span>
+                    </div>
+                  </div>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -137,10 +231,47 @@ const PaletteDetailDialog = ({ palette, isOpen, onClose }) => {
             </div>
           </div>
 
-          {(showCopiedAll) && (
+          <Tabs defaultValue="achromatopsia" value={selectedView} onValueChange={setSelectedView}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="achromatopsia">Achromatopsia</TabsTrigger>
+              <TabsTrigger value="protanopia">Protanopia</TabsTrigger>
+              <TabsTrigger value="deuteranopia">Deuteranopia</TabsTrigger>
+              <TabsTrigger value="tritanopia">Tritanopia</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="achromatopsia">
+              <ColorblindPreview colors={palette.colors} type="achromatopsia" />
+              <div className="text-sm text-gray-500 mt-1">
+                Complete color blindness; vision is entirely in grayscale.
+              </div>
+            </TabsContent>
+
+            <TabsContent value="protanopia">
+              <ColorblindPreview colors={palette.colors} type="protanopia" />
+              <div className="text-sm text-gray-500 mt-1">
+                Red-blindness; difficulty distinguishing reds and greens due to lack of red cone function.
+              </div>
+            </TabsContent>
+
+            <TabsContent value="deuteranopia">
+              <ColorblindPreview colors={palette.colors} type="deuteranopia" />
+              <div className="text-sm text-gray-500 mt-1">
+                Green-blindness; difficulty distinguishing reds and greens due to lack of green cone function.
+              </div>
+            </TabsContent>
+
+            <TabsContent value="tritanopia">
+              <ColorblindPreview colors={palette.colors} type="tritanopia" />
+              <div className="text-sm text-gray-500 mt-1">
+                Blue-yellow blindness; difficulty distinguishing blues and yellows due to lack of blue cone function.
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          {showCopiedAll && (
             <Alert className="bg-green-50 text-green-700 border-green-200">
               <AlertDescription>
-                {'All colors copied to clipboard!'}
+                All colors copied to clipboard!
               </AlertDescription>
             </Alert>
           )}
