@@ -233,11 +233,11 @@ const PaletteDisplay = ({ palettes = defaultPalettes }) => {
       <div className="max-w-7xl mx-auto px-6">
         <div className="h-24" />
 
-        <p className="text-sm text-gray-500 mb-4">
+        <p className="text-sm text-gray-500 mb-4 lg:text-center">
           Showing {filteredPalettes.length} of {palettes.length} palettes
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6 grid-shifted">
           {filteredPalettes.map((palette) => (
             <a onClick={(e) => handlePaletteSelect(e, palette)} key={palette.id} href={`#${encodeURIComponent(palette.id)}`}>
               <Card
