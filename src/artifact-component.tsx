@@ -125,48 +125,37 @@ const PaletteDisplay = ({ palettes = defaultPalettes }) => {
   const [selectedPalette, setSelectedPalette] = useState<any>(null);
 
   useEffect(() => {
-    // Check URL for palette parameter on mount
-    const params = new URLSearchParams(window.location.search);
-    const paletteId = params.get('palette');
-    if (paletteId) {
-      const palette = palettes.find(p => p.id === paletteId);
-      if (palette) {
-        setSelectedPalette(palette);
-      }
-    }
-
-    // Listen for browser back/forward navigation
-    const handlePopState = () => {
-      const params = new URLSearchParams(window.location.search);
-      const paletteId = params.get('palette');
-      if (paletteId) {
-        const palette = palettes.find(p => p.id === paletteId);
-        setSelectedPalette(palette);
+    // Check URL hash for palette on mount
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1); // Remove the # symbol
+      if (hash) {
+        const palette = palettes.find(p => p.id === decodeURIComponent(hash));
+        if (palette) {
+          setSelectedPalette(palette);
+        }
       } else {
         setSelectedPalette(null);
       }
     };
 
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+    // Initial check
+    handleHashChange();
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [palettes]);
 
   const handlePaletteSelect = (e, palette) => {
     e.preventDefault();
-
-    setSelectedPalette(palette);
-    // Update URL without reload
-    const url = new URL(window.location.href);
-    url.searchParams.set('palette', palette.id);
-    window.history.pushState({}, '', url);
+    // Update hash without page reload
+    window.location.hash = encodeURIComponent(palette.id);
   };
 
   const handlePaletteClose = () => {
+    // Clear hash without page reload
+    history.pushState('', document.title, window.location.pathname + window.location.search);
     setSelectedPalette(null);
-    // Remove palette parameter from URL
-    const url = new URL(window.location.href);
-    url.searchParams.delete('palette');
-    window.history.pushState({}, '', url);
   };
 
   const paletteTypes = ['all', ...new Set(palettes.map(p => p.type))];
@@ -219,7 +208,7 @@ const PaletteDisplay = ({ palettes = defaultPalettes }) => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           {filteredPalettes.map((palette) => (
-            <a onClick={(e) => handlePaletteSelect(e, palette)} key={palette.id} href={`?palette=${palette.id}`}>
+            <a onClick={(e) => handlePaletteSelect(e, palette)} key={palette.id} href={`#${encodeURIComponent(palette.id)}`}>
               <Card
                 className="overflow-hidden cursor-pointer hover:shadow-xl transition-shadow"
               >
