@@ -60,7 +60,7 @@ const PaletteDisplay = ({ palettes = defaultPalettes }) => {
   // Set up virtualizer using window scroll
   const virtualizer = useWindowVirtualizer({
     count: rowCount,
-    estimateSize: () => 180, // Estimated row height
+    estimateSize: () => 160, // Estimated row height
     overscan: 5,
   });
 
