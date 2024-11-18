@@ -1,27 +1,73 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import PaletteDetailDialog from './my-components/PaletteDetailDialog'
-
-const defaultPalettes = [
-  {"package":"awtools","palette":"a_palette","length":8,"type":"sequential","id":"awtools::a_palette","colors":["#2A363B","#019875","#99B898","#FECEA8","#FF847C","#E84A5F","#C0392B","#96281B"]},
-  {"package":"awtools","palette":"ppalette","length":8,"type":"qualitative","id":"awtools::ppalette","colors":["#F7DC05","#3D98D3","#EC0B88","#5E35B1","#F9791E","#3DD378","#C6C6C6","#444444"]},
-  {"package":"awtools","palette":"bpalette","length":16,"type":"qualitative","id":"awtools::bpalette","colors":["#C62828","#F44336","#9C27B0","#673AB7","#3F51B5","#2196F3","#29B6F6","#006064","#009688","#4CAF50","#8BC34A","#FFEB3B","#FF9800","#795548","#9E9E9E","#607D8B"]},
-  {"package":"awtools","palette":"gpalette","length":4,"type":"sequential","id":"awtools::gpalette","colors":["#D6D6D6","#ADADAD","#707070","#333333"]},
-  {"package":"awtools","palette":"mpalette","length":9,"type":"qualitative","id":"awtools::mpalette","colors":["#017A4A","#FFCE4E","#3D98D3","#FF363C","#7559A2","#794924","#8CDB5E","#D6D6D6","#FB8C00"]},
-  {"package":"awtools","palette":"spalette","length":6,"type":"qualitative","id":"awtools::spalette","colors":["#9F248F","#FFCE4E","#017A4A","#F9791E","#244579","#C6242D"]}
-];
+import PaletteDetailDialog from './my-components/PaletteDetailDialog';
+import { useWindowVirtualizer } from '@tanstack/react-virtual';
 
 const PaletteDisplay = ({ palettes = defaultPalettes }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
-  const [selectedPalette, setSelectedPalette] = useState<any>(null);
+  const [selectedPalette, setSelectedPalette] = useState(null);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
 
+  // Debounce search term
   useEffect(() => {
-    // Check URL hash for palette on mount
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Memoize palette types for select dropdown
+  const paletteTypes = useMemo(() =>
+    ['all', ...new Set(palettes.map(p => p.type))],
+    [palettes]
+  );
+
+  // Memoize filtered palettes
+  const filteredPalettes = useMemo(() => {
+    return palettes.filter(palette => {
+      const matchesSearch = palette.palette.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
+      const matchesType = selectedType === 'all' || palette.type === selectedType;
+      return matchesSearch && matchesType;
+    });
+  }, [palettes, debouncedSearchTerm, selectedType]);
+
+  // Calculate the number of columns based on viewport width
+  const getColumnCount = () => {
+    if (typeof window === 'undefined') return 3;
+    if (window.innerWidth < 768) return 1;
+    if (window.innerWidth < 1024) return 2;
+    return 3;
+  };
+
+  const [columnCount, setColumnCount] = useState(getColumnCount());
+
+  // Update column count on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setColumnCount(getColumnCount());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Calculate rows for virtualization
+  const rowCount = Math.ceil(filteredPalettes.length / columnCount);
+
+  // Set up virtualizer using window scroll
+  const virtualizer = useWindowVirtualizer({
+    count: rowCount,
+    estimateSize: () => 180, // Estimated row height
+    overscan: 5,
+  });
+
+  // URL hash handling
+  useEffect(() => {
     const handleHashChange = () => {
-      const hash = window.location.hash.slice(1); // Remove the # symbol
+      const hash = window.location.hash.slice(1);
       if (hash) {
         const palette = palettes.find(p => p.id === decodeURIComponent(hash));
         if (palette) {
@@ -32,33 +78,20 @@ const PaletteDisplay = ({ palettes = defaultPalettes }) => {
       }
     };
 
-    // Initial check
     handleHashChange();
-
-    // Listen for hash changes
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, [palettes]);
 
   const handlePaletteSelect = (e, palette) => {
     e.preventDefault();
-    // Update hash without page reload
     window.location.hash = encodeURIComponent(palette.id);
   };
 
   const handlePaletteClose = () => {
-    // Clear hash without page reload
     history.pushState('', document.title, window.location.pathname + window.location.search);
     setSelectedPalette(null);
   };
-
-  const paletteTypes = ['all', ...new Set(palettes.map(p => p.type))];
-
-  const filteredPalettes = palettes.filter(palette => {
-    const matchesSearch = palette.palette.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = selectedType === 'all' || palette.type === selectedType;
-    return matchesSearch && matchesType;
-  });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -100,35 +133,61 @@ const PaletteDisplay = ({ palettes = defaultPalettes }) => {
           Showing {filteredPalettes.length} of {palettes.length} palettes
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6 grid-shifted">
-          {filteredPalettes.map((palette) => (
-            <a onClick={(e) => handlePaletteSelect(e, palette)} key={palette.id} href={`#${encodeURIComponent(palette.id)}`}>
-              <Card
-                className="overflow-hidden cursor-pointer hover:shadow-xl transition-shadow"
+        <div
+          style={{
+            height: `${virtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          {virtualizer.getVirtualItems().map(virtualRow => {
+            const startIndex = virtualRow.index * columnCount;
+            const rowPalettes = filteredPalettes.slice(startIndex, startIndex + columnCount);
+
+            return (
+              <div
+                key={virtualRow.index}
+                className={`absolute left-0 w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6`}
+                style={{
+                  transform: `translateY(${virtualRow.start}px)`,
+                  height: `${virtualRow.size}px`,
+                }}
               >
-                <CardHeader className="pb-2">
-                  <div className="relative">
-                    <span className="text-sm text-gray-400 absolute top-1 right-0">
-                    &#123;{palette.package}&#125; • {palette.length} • {palette.type}
-                    </span>
-                    <span className="text-xl font-semibold relative inline-block bg-white pr-3">{palette.palette}</span>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex h-12 rounded-md overflow-hidden">
-                    {palette.colors.map((color, index) => (
-                      <div
-                        key={`${palette.id}-${index}`}
-                        className="flex-1 h-full"
-                        style={{ backgroundColor: color }}
-                        title={color}
-                      />
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </a>
-          ))}
+                {rowPalettes.map((palette) => (
+                  <a
+                    onClick={(e) => handlePaletteSelect(e, palette)}
+                    key={palette.id}
+                    href={`#${encodeURIComponent(palette.id)}`}
+                  >
+                    <Card className="overflow-hidden cursor-pointer hover:shadow-xl transition-shadow">
+                      <CardHeader className="pb-2">
+                        <div className="relative">
+                          <span className="text-sm text-gray-400 absolute top-1 right-0">
+                            &#123;{palette.package}&#125; • {palette.length} • {palette.type}
+                          </span>
+                          <span className="text-xl font-semibold relative inline-block bg-white pr-3">
+                            {palette.palette}
+                          </span>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex h-12 rounded-md overflow-hidden">
+                          {palette.colors.map((color, index) => (
+                            <div
+                              key={`${palette.id}-${index}`}
+                              className="flex-1 h-full"
+                              style={{ backgroundColor: color }}
+                              title={color}
+                            />
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </a>
+                ))}
+              </div>
+            );
+          })}
         </div>
 
         {filteredPalettes.length === 0 && (
