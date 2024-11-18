@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import PaletteDetailDialog from './my-components/PaletteDetailDialog';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 
-const PaletteDisplay = ({ palettes = defaultPalettes }) => {
+const PaletteDisplay = ({ palettes }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedPalette, setSelectedPalette] = useState(null);
