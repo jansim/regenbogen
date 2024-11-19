@@ -17,11 +17,11 @@ const PaletteDisplay = ({ palettes }) => {
   const [selectedType, setSelectedType] = useState("all");
   const [selectedPalette, setSelectedPalette] = useState(null);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [plotType, setPlotType] = useState("mixed");
+  const [plotType, setPlotType] = useState("palette");
 
   const plotTypeOptions = [
-    "mixed",
     "palette",
+    "mixed",
     "bar",
     "area",
     "boxplot",
