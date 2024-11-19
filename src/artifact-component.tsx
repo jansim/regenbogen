@@ -174,7 +174,7 @@ const PaletteDisplay = ({ palettes }) => {
             return (
               <div
                 key={virtualRow.index}
-                className={`absolute left-0 w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6`}
+                className={`absolute left-0 w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid-shifted`}
                 style={{
                   transform: `translateY(${virtualRow.start}px)`,
                   height: `${virtualRow.size}px`,
@@ -187,12 +187,12 @@ const PaletteDisplay = ({ palettes }) => {
                     href={`#${encodeURIComponent(palette.id)}`}
                   >
                     <Card className="overflow-hidden cursor-pointer hover:shadow-xl transition-shadow">
-                      <CardHeader className="pb-2">
+                      <CardHeader className="pt-4 pb-2">
                         <div className="relative">
                           <span className="text-sm text-gray-400 absolute top-1 right-0">
                             &#123;{palette.package}&#125; • {palette.length} • {palette.type}
                           </span>
-                          <span className="text-xl font-semibold relative inline-block bg-white pr-3">
+                          <span className="text-xl text-gray-600 relative inline-block bg-white pr-3">
                             {palette.palette}
                           </span>
                         </div>

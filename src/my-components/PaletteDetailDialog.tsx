@@ -229,54 +229,56 @@ const PaletteDetailDialog = ({ palette = defaultPalette, isOpen = true, onClose 
             </div>
           </div>
 
-          <h3 className="text-lg font-semibold mt-4">Colorblindness</h3>
+          <div>
+            <h3 className="text-lg font-semibold mt-8 mb-4">Colorblindness</h3>
 
-          <Tabs defaultValue="achromatopsia" value={selectedView} onValueChange={setSelectedView}>
-            <TabsList className="mb-4">
-              <TabsTrigger value="none">None</TabsTrigger>
-              <TabsTrigger value="achromatopsia">Achromatopsia</TabsTrigger>
-              <TabsTrigger value="protanopia">Protanopia</TabsTrigger>
-              <TabsTrigger value="deuteranopia">Deuteranopia</TabsTrigger>
-              <TabsTrigger value="tritanopia">Tritanopia</TabsTrigger>
-            </TabsList>
+            <Tabs defaultValue="achromatopsia" value={selectedView} onValueChange={setSelectedView}>
+              <TabsList className="mb-4">
+                <TabsTrigger value="none">None</TabsTrigger>
+                <TabsTrigger value="achromatopsia">Achromatopsia</TabsTrigger>
+                <TabsTrigger value="protanopia">Protanopia</TabsTrigger>
+                <TabsTrigger value="deuteranopia">Deuteranopia</TabsTrigger>
+                <TabsTrigger value="tritanopia">Tritanopia</TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="none">
-              <div className="text-sm text-gray-500 mt-1">
-                Colors don't look the same to all people. Choose a type of color blindness above to simulate how the palette appears to people with this form of color vision deficiency.
-              </div>
-            </TabsContent>
+              <TabsContent value="none">
+                <div className="text-sm text-gray-500 mt-1">
+                  Colors don't look the same to all people. Choose a type of color blindness above to simulate how the palette appears to people with this form of color vision deficiency.
+                </div>
+              </TabsContent>
 
-            <TabsContent value="achromatopsia">
-              <ColorblindPreview colors={palette.colors} type="achromatopsia" />
-              <div className="text-sm text-gray-500 mt-1">
-                Complete color blindness; vision is entirely in grayscale.
-              </div>
-            </TabsContent>
+              <TabsContent value="achromatopsia">
+                <ColorblindPreview colors={palette.colors} type="achromatopsia" />
+                <div className="text-sm text-gray-500 mt-1">
+                  Complete color blindness; vision is entirely in grayscale.
+                </div>
+              </TabsContent>
 
-            <TabsContent value="protanopia">
-              <ColorblindPreview colors={palette.colors} type="protanopia" />
-              <div className="text-sm text-gray-500 mt-1">
-                Red-blindness; difficulty distinguishing reds and greens due to lack of red cone function.
-              </div>
-            </TabsContent>
+              <TabsContent value="protanopia">
+                <ColorblindPreview colors={palette.colors} type="protanopia" />
+                <div className="text-sm text-gray-500 mt-1">
+                  Red-blindness; difficulty distinguishing reds and greens due to lack of red cone function.
+                </div>
+              </TabsContent>
 
-            <TabsContent value="deuteranopia">
-              <ColorblindPreview colors={palette.colors} type="deuteranopia" />
-              <div className="text-sm text-gray-500 mt-1">
-                Green-blindness; difficulty distinguishing reds and greens due to lack of green cone function.
-              </div>
-            </TabsContent>
+              <TabsContent value="deuteranopia">
+                <ColorblindPreview colors={palette.colors} type="deuteranopia" />
+                <div className="text-sm text-gray-500 mt-1">
+                  Green-blindness; difficulty distinguishing reds and greens due to lack of green cone function.
+                </div>
+              </TabsContent>
 
-            <TabsContent value="tritanopia">
-              <ColorblindPreview colors={palette.colors} type="tritanopia" />
-              <div className="text-sm text-gray-500 mt-1">
-                Blue-yellow blindness; difficulty distinguishing blues and yellows due to lack of blue cone function.
-              </div>
-            </TabsContent>
-          </Tabs>
+              <TabsContent value="tritanopia">
+                <ColorblindPreview colors={palette.colors} type="tritanopia" />
+                <div className="text-sm text-gray-500 mt-1">
+                  Blue-yellow blindness; difficulty distinguishing blues and yellows due to lack of blue cone function.
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
 
           <div>
-            <h3 className="text-lg font-semibold mt-4">Plot Previews</h3>
+            <h3 className="text-lg font-semibold mt-8 mb-4">Plot Previews</h3>
             <div className="grid grid-cols-3 gap-4">
               {plotTypes.map((type) => (
                 <Plot type={type} colors={simulateColorBlindnessArray(palette.colors, selectedView)} />
