@@ -19,7 +19,7 @@ const Plot = ({
   let effectiveColors = colors;
   while (effectiveColors.length < 5) {
     // Repeat colors if there are less than 5
-    effectiveColors = colors.concat(colors.slice(0, 5 - colors.length));
+    effectiveColors = effectiveColors.concat(colors.slice(0, 5 - colors.length));
   }
 
   const modifiedSvg = svgTemplates[type]
