@@ -4,8 +4,9 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import PaletteDetailDialog from './my-components/PaletteDetailDialog';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
+import Plot from './my-components/Plot'
 
-const PaletteDisplay = ({ palettes }) => {
+const PaletteDisplay = ({ palettes, plotType = "bar" }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedPalette, setSelectedPalette] = useState(null);
@@ -60,7 +61,7 @@ const PaletteDisplay = ({ palettes }) => {
   // Set up virtualizer using window scroll
   const virtualizer = useWindowVirtualizer({
     count: rowCount,
-    estimateSize: () => 160, // Estimated row height
+    estimateSize: () => 400, // Estimated row height
     overscan: 5,
   });
 
@@ -171,16 +172,22 @@ const PaletteDisplay = ({ palettes }) => {
                         </div>
                       </CardHeader>
                       <CardContent>
-                        <div className="flex h-12 rounded-md overflow-hidden">
-                          {palette.colors.map((color, index) => (
-                            <div
-                              key={`${palette.id}-${index}`}
-                              className="flex-1 h-full"
-                              style={{ backgroundColor: color }}
-                              title={color}
-                            />
-                          ))}
-                        </div>
+                        {
+                          plotType == "palette" ? (
+                            <div className="flex h-12 rounded-md overflow-hidden">
+                              {palette.colors.map((color, index) => (
+                                <div
+                                  key={`${palette.id}-${index}`}
+                                  className="flex-1 h-full"
+                                  style={{ backgroundColor: color }}
+                                  title={color}
+                                />
+                              ))}
+                            </div>
+                          ) : (
+                            <Plot colors={palette.colors} type={plotType}></Plot>
+                          )
+                        }
                       </CardContent>
                     </Card>
                   </a>
