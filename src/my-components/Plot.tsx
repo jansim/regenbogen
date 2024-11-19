@@ -1,5 +1,3 @@
-import React from 'react';
-
 import svgTemplates from './svgTemplates'
 
 const Plot = ({

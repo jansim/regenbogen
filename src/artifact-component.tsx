@@ -26,10 +26,10 @@ const PaletteDisplay = ({ palettes }) => {
   }, [searchTerm]);
 
   // Memoize palette types for select dropdown
-  const paletteTypes = useMemo(() =>
+  const paletteTypes: string[] = useMemo(() =>
     ['all', ...new Set(palettes.map(p => p.type))],
     [palettes]
-  );
+  ) as any;
 
   // Memoize filtered palettes
   const filteredPalettes = useMemo(() => {

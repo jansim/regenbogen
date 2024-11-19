@@ -100,14 +100,14 @@ const ColorblindPreview = ({ colors, type }) => {
 };
 
 const PaletteDetailDialog = ({ palette = defaultPalette, isOpen = true, onClose }) => {
-  const [copiedIndex, setCopiedIndex] = useState(null);
+  const [copiedIndex, setCopiedIndex] = useState<number|null>(null);
   const [showCopiedAll, setShowCopiedAll] = useState(false);
   const [isListExpanded, setIsListExpanded] = useState(false);
-  const [copiedPreviewIndex, setCopiedPreviewIndex] = useState(null);
+  const [copiedPreviewIndex, setCopiedPreviewIndex] = useState<number|null>(null);
   const [selectedView, setSelectedView] = useState('none');
 
   const plotTypes = ['bar', 'line', 'scatter', 'area', 'boxplot', 'map'];
-  const copyToClipboard = async (text, index = null, isPreview = false) => {
+  const copyToClipboard = async (text, index: number | null = null, isPreview = false) => {
     try {
       await navigator.clipboard.writeText(text);
       if (isPreview) {
