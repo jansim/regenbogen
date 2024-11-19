@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='570.00pt' height='473.00pt' viewBox='0 0 570.00 473.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: none;'/>
+<defs>
+  <clipPath id='cpMC4wMHw1NzAuMDB8MC4wMHw0NzMuMDA='>
+    <rect x='0.00' y='0.00' width='570.00' height='473.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw1NzAuMDB8MC4wMHw0NzMuMDA=)'>
+<rect x='25.91' y='13.64' width='167.16' height='81.87' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #0000F0;' />
+<rect x='25.91' y='104.61' width='234.02' height='81.87' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #00FF00;' />
+<rect x='25.91' y='195.57' width='518.18' height='81.87' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #00F000;' />
+<rect x='25.91' y='286.53' width='250.73' height='81.87' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #FF0000;' />
+<rect x='25.91' y='377.49' width='351.03' height='81.87' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #F00000;' />
+</g>
+</svg>
