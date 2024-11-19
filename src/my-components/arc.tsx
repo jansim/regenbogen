@@ -1,7 +1,13 @@
 const ArcColorPalette = () => {
   const colors = [
-    "#2A363BFF", "#019875FF", "#99B898FF", "#FECEA8FF",
-    "#FF847CFF", "#E84A5FFF", "#C0392BFF", "#96281BFF"
+    "#2A363BFF",
+    "#019875FF",
+    "#99B898FF",
+    "#FECEA8FF",
+    "#FF847CFF",
+    "#E84A5FFF",
+    "#C0392BFF",
+    "#96281BFF",
   ];
 
   // SVG dimensions
@@ -17,7 +23,7 @@ const ArcColorPalette = () => {
 
   // Generate the arc paths
   const generateArcPath = (index) => {
-    const startAngle = Math.PI - (index * anglePerSegment);
+    const startAngle = Math.PI - index * anglePerSegment;
     const endAngle = startAngle - anglePerSegment;
 
     const innerRadius = radius - arcWidth;
@@ -51,10 +57,7 @@ const ArcColorPalette = () => {
     <svg width={width} height={height}>
       {colors.map((color, index) => (
         <g key={color}>
-          <path
-            d={generateArcPath(index)}
-            fill={color}
-          />
+          <path d={generateArcPath(index)} fill={color} />
         </g>
       ))}
     </svg>

@@ -1,21 +1,36 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import PaletteDetailDialog from './my-components/PaletteDetailDialog';
-import { useWindowVirtualizer } from '@tanstack/react-virtual';
-import Plot from './my-components/Plot'
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import PaletteDetailDialog from "./my-components/PaletteDetailDialog";
+import { useWindowVirtualizer } from "@tanstack/react-virtual";
+import Plot from "./my-components/Plot";
 
 const PaletteDisplay = ({ palettes }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedType, setSelectedType] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState("all");
   const [selectedPalette, setSelectedPalette] = useState(null);
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
-  const [plotType, setPlotType] = useState('mixed');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [plotType, setPlotType] = useState("mixed");
 
-  const plotTypeOptions = ['mixed', 'palette', 'bar', 'area', 'boxplot', 'line', "map", "scatter"];
+  const plotTypeOptions = [
+    "mixed",
+    "palette",
+    "bar",
+    "area",
+    "boxplot",
+    "line",
+    "map",
+    "scatter",
+  ];
   // Plot types to cycle through when plotType is set to 'mixed' (should not be a multiple of 3 ideally)
-  const mixedPlotTypes = ['bar', 'area', 'boxplot', 'line', "scatter"]
+  const mixedPlotTypes = ["bar", "area", "boxplot", "line", "scatter"];
 
   // Debounce search term
   useEffect(() => {
@@ -26,23 +41,26 @@ const PaletteDisplay = ({ palettes }) => {
   }, [searchTerm]);
 
   // Memoize palette types for select dropdown
-  const paletteTypes: string[] = useMemo(() =>
-    ['all', ...new Set(palettes.map(p => p.type))],
-    [palettes]
+  const paletteTypes: string[] = useMemo(
+    () => ["all", ...new Set(palettes.map((p) => p.type))],
+    [palettes],
   ) as any;
 
   // Memoize filtered palettes
   const filteredPalettes = useMemo(() => {
-    return palettes.filter(palette => {
-      const matchesSearch = palette.palette.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
-      const matchesType = selectedType === 'all' || palette.type === selectedType;
+    return palettes.filter((palette) => {
+      const matchesSearch = palette.palette
+        .toLowerCase()
+        .includes(debouncedSearchTerm.toLowerCase());
+      const matchesType =
+        selectedType === "all" || palette.type === selectedType;
       return matchesSearch && matchesType;
     });
   }, [palettes, debouncedSearchTerm, selectedType]);
 
   // Calculate the number of columns based on viewport width
   const getColumnCount = useCallback(() => {
-    if (typeof window === 'undefined') return 3;
+    if (typeof window === "undefined") return 3;
     if (window.innerWidth < 768) return 1;
     if (window.innerWidth < 1024) return 2;
     return 3;
@@ -56,8 +74,8 @@ const PaletteDisplay = ({ palettes }) => {
       setColumnCount(getColumnCount());
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [getColumnCount]);
 
   // Calculate rows for virtualization
@@ -65,7 +83,7 @@ const PaletteDisplay = ({ palettes }) => {
 
   // Dynamically adjust estimated row height based on plot type
   const getEstimatedRowHeight = useCallback(() => {
-    return plotType === 'palette' ? 160 : 400;
+    return plotType === "palette" ? 160 : 400;
   }, [plotType]);
 
   // Key change: include plotType in dependencies to force re-creation when plot type changes
@@ -84,7 +102,7 @@ const PaletteDisplay = ({ palettes }) => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1);
       if (hash) {
-        const palette = palettes.find(p => p.id === decodeURIComponent(hash));
+        const palette = palettes.find((p) => p.id === decodeURIComponent(hash));
         if (palette) {
           setSelectedPalette(palette);
         }
@@ -94,8 +112,8 @@ const PaletteDisplay = ({ palettes }) => {
     };
 
     handleHashChange();
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
   }, [palettes]);
 
   const handlePaletteSelect = (e, palette) => {
@@ -104,7 +122,11 @@ const PaletteDisplay = ({ palettes }) => {
   };
 
   const handlePaletteClose = () => {
-    history.pushState('', document.title, window.location.pathname + window.location.search);
+    history.pushState(
+      "",
+      document.title,
+      window.location.pathname + window.location.search,
+    );
     setSelectedPalette(null);
   };
 
@@ -115,7 +137,11 @@ const PaletteDisplay = ({ palettes }) => {
           <div className="h-20 flex items-center justify-between">
             <h1 className="text-3xl font-bold">
               Regenbogen
-              <img className="w-12 ml-3 inline-block relative" src="logo.svg" style={{bottom: '0.12em'}}/>
+              <img
+                className="w-12 ml-3 inline-block relative"
+                src="logo.svg"
+                style={{ bottom: "0.12em" }}
+              />
             </h1>
             <div className="flex gap-4">
               <Input
@@ -129,7 +155,7 @@ const PaletteDisplay = ({ palettes }) => {
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {paletteTypes.map(type => (
+                  {paletteTypes.map((type) => (
                     <SelectItem key={type} value={type}>
                       {type.charAt(0).toUpperCase() + type.slice(1)}
                     </SelectItem>
@@ -141,7 +167,7 @@ const PaletteDisplay = ({ palettes }) => {
                   <SelectValue placeholder="Select plot type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {plotTypeOptions.map(type => (
+                  {plotTypeOptions.map((type) => (
                     <SelectItem key={type} value={type}>
                       {type.charAt(0).toUpperCase() + type.slice(1)}
                     </SelectItem>
@@ -163,13 +189,16 @@ const PaletteDisplay = ({ palettes }) => {
         <div
           style={{
             height: `${virtualizer.getTotalSize()}px`,
-            width: '100%',
-            position: 'relative',
+            width: "100%",
+            position: "relative",
           }}
         >
-          {virtualizer.getVirtualItems().map(virtualRow => {
+          {virtualizer.getVirtualItems().map((virtualRow) => {
             const startIndex = virtualRow.index * columnCount;
-            const rowPalettes = filteredPalettes.slice(startIndex, startIndex + columnCount);
+            const rowPalettes = filteredPalettes.slice(
+              startIndex,
+              startIndex + columnCount,
+            );
 
             return (
               <div
@@ -190,7 +219,8 @@ const PaletteDisplay = ({ palettes }) => {
                       <CardHeader className="pt-4 pb-2">
                         <div className="relative">
                           <span className="text-sm text-gray-400 absolute top-1 right-0">
-                            &#123;{palette.package}&#125; • {palette.length} • {palette.type}
+                            &#123;{palette.package}&#125; • {palette.length} •{" "}
+                            {palette.type}
                           </span>
                           <span className="text-xl text-gray-600 relative inline-block bg-white pr-3">
                             {palette.palette}
@@ -198,22 +228,30 @@ const PaletteDisplay = ({ palettes }) => {
                         </div>
                       </CardHeader>
                       <CardContent>
-                        {
-                          plotType === "palette" ? (
-                            <div className="flex h-12 rounded-md overflow-hidden">
-                              {palette.colors.map((color, index) => (
-                                <div
-                                  key={`${palette.id}-${index}`}
-                                  className="flex-1 h-full"
-                                  style={{ backgroundColor: color }}
-                                  title={color}
-                                />
-                              ))}
-                            </div>
-                          ) : (
-                            <Plot colors={palette.colors} type={plotType === "mixed" ? mixedPlotTypes[(startIndex + paletteIndexInRow) % mixedPlotTypes.length] : plotType}></Plot>
-                          )
-                        }
+                        {plotType === "palette" ? (
+                          <div className="flex h-12 rounded-md overflow-hidden">
+                            {palette.colors.map((color, index) => (
+                              <div
+                                key={`${palette.id}-${index}`}
+                                className="flex-1 h-full"
+                                style={{ backgroundColor: color }}
+                                title={color}
+                              />
+                            ))}
+                          </div>
+                        ) : (
+                          <Plot
+                            colors={palette.colors}
+                            type={
+                              plotType === "mixed"
+                                ? mixedPlotTypes[
+                                    (startIndex + paletteIndexInRow) %
+                                      mixedPlotTypes.length
+                                  ]
+                                : plotType
+                            }
+                          ></Plot>
+                        )}
                       </CardContent>
                     </Card>
                   </a>

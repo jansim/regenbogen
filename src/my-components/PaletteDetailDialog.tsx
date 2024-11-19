@@ -1,39 +1,51 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Check, Copy, ChevronRight } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { useState } from 'react'
-import Plot from './Plot';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Check, Copy, ChevronRight } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useState } from "react";
+import Plot from "./Plot";
 
-const defaultPalette = {"package":"awtools","palette":"a_palette","length":8,"type":"sequential","id":"awtools::a_palette","colors":["#2A363B","#019875","#99B898","#FECEA8","#FF847C","#E84A5F","#C0392B","#96281B"]};
+const defaultPalette = {
+  package: "awtools",
+  palette: "a_palette",
+  length: 8,
+  type: "sequential",
+  id: "awtools::a_palette",
+  colors: [
+    "#2A363B",
+    "#019875",
+    "#99B898",
+    "#FECEA8",
+    "#FF847C",
+    "#E84A5F",
+    "#C0392B",
+    "#96281B",
+  ],
+};
 
 // Color blindness simulation matrices
 const colorblindnessTypes = {
   protanopia: [
-    0.567, 0.433, 0, 0, 0,
-    0.558, 0.442, 0, 0, 0,
-    0, 0.242, 0.758, 0, 0,
-    0, 0, 0, 1, 0
+    0.567, 0.433, 0, 0, 0, 0.558, 0.442, 0, 0, 0, 0, 0.242, 0.758, 0, 0, 0, 0,
+    0, 1, 0,
   ],
   deuteranopia: [
-    0.625, 0.375, 0, 0, 0,
-    0.7, 0.3, 0, 0, 0,
-    0, 0.3, 0.7, 0, 0,
-    0, 0, 0, 1, 0
+    0.625, 0.375, 0, 0, 0, 0.7, 0.3, 0, 0, 0, 0, 0.3, 0.7, 0, 0, 0, 0, 0, 1, 0,
   ],
   tritanopia: [
-    0.95, 0.05, 0, 0, 0,
-    0, 0.433, 0.567, 0, 0,
-    0, 0.475, 0.525, 0, 0,
-    0, 0, 0, 1, 0
+    0.95, 0.05, 0, 0, 0, 0, 0.433, 0.567, 0, 0, 0, 0.475, 0.525, 0, 0, 0, 0, 0,
+    1, 0,
   ],
   achromatopsia: [
-    0.299, 0.587, 0.114, 0, 0,
-    0.299, 0.587, 0.114, 0, 0,
-    0.299, 0.587, 0.114, 0, 0,
-    0, 0, 0, 1, 0
-  ]
+    0.299, 0.587, 0.114, 0, 0, 0.299, 0.587, 0.114, 0, 0, 0.299, 0.587, 0.114,
+    0, 0, 0, 0, 0, 1, 0,
+  ],
 };
 
 const hexToRgb = (hex, float = true) => {
@@ -46,8 +58,7 @@ const hexToRgb = (hex, float = true) => {
   } else {
     return [r, g, b];
   }
-}
-
+};
 
 const simulateColorBlindness = (color, type) => {
   if (type == "none") {
@@ -70,18 +81,20 @@ const simulateColorBlindness = (color, type) => {
   // Convert back to hex
   const toHex = (n) => {
     const intVal = Math.round(Math.max(0, Math.min(1, n)) * 255); // Clamp and scale
-    return intVal.toString(16).padStart(2, '0');
+    return intVal.toString(16).padStart(2, "0");
   };
 
   return `#${toHex(newR)}${toHex(newG)}${toHex(newB)}`;
 };
 
 const simulateColorBlindnessArray = (colors, type) => {
-  return colors.map(color => simulateColorBlindness(color, type));
-}
+  return colors.map((color) => simulateColorBlindness(color, type));
+};
 
 const ColorblindPreview = ({ colors, type }) => {
-  const simulatedColors = colors.map(color => simulateColorBlindness(color, type));
+  const simulatedColors = colors.map((color) =>
+    simulateColorBlindness(color, type),
+  );
 
   return (
     <div className="space-y-2">
@@ -99,15 +112,25 @@ const ColorblindPreview = ({ colors, type }) => {
   );
 };
 
-const PaletteDetailDialog = ({ palette = defaultPalette, isOpen = true, onClose }) => {
-  const [copiedIndex, setCopiedIndex] = useState<number|null>(null);
+const PaletteDetailDialog = ({
+  palette = defaultPalette,
+  isOpen = true,
+  onClose,
+}) => {
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [showCopiedAll, setShowCopiedAll] = useState(false);
   const [isListExpanded, setIsListExpanded] = useState(false);
-  const [copiedPreviewIndex, setCopiedPreviewIndex] = useState<number|null>(null);
-  const [selectedView, setSelectedView] = useState('none');
+  const [copiedPreviewIndex, setCopiedPreviewIndex] = useState<number | null>(
+    null,
+  );
+  const [selectedView, setSelectedView] = useState("none");
 
-  const plotTypes = ['bar', 'line', 'scatter', 'area', 'boxplot', 'map'];
-  const copyToClipboard = async (text, index: number | null = null, isPreview = false) => {
+  const plotTypes = ["bar", "line", "scatter", "area", "boxplot", "map"];
+  const copyToClipboard = async (
+    text,
+    index: number | null = null,
+    isPreview = false,
+  ) => {
     try {
       await navigator.clipboard.writeText(text);
       if (isPreview) {
@@ -121,27 +144,33 @@ const PaletteDetailDialog = ({ palette = defaultPalette, isOpen = true, onClose 
         setTimeout(() => setShowCopiedAll(false), 1000);
       }
     } catch (err) {
-      console.error('Failed to copy:', err);
+      console.error("Failed to copy:", err);
     }
   };
 
   const copyAllColors = () => {
-    const colorsList = palette.colors.join(', ');
+    const colorsList = palette.colors.join(", ");
     copyToClipboard(colorsList);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl overflow-auto" style={{ maxHeight: '95vh' }}>
+      <DialogContent
+        className="max-w-4xl overflow-auto"
+        style={{ maxHeight: "95vh" }}
+      >
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">{palette.palette}</DialogTitle>
+          <DialogTitle className="text-2xl font-bold">
+            {palette.palette}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-sm text-gray-500">
-                &#123;{palette.package}&#125; • {palette.length} colors • {palette.type}
+                &#123;{palette.package}&#125; • {palette.length} colors •{" "}
+                {palette.type}
               </p>
             </div>
             <div className="flex gap-2">
@@ -150,7 +179,11 @@ const PaletteDetailDialog = ({ palette = defaultPalette, isOpen = true, onClose 
                 onClick={copyAllColors}
                 className="flex items-center gap-2"
               >
-                {showCopiedAll ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {showCopiedAll ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
                 Copy All
               </Button>
             </div>
@@ -184,14 +217,14 @@ const PaletteDetailDialog = ({ palette = defaultPalette, isOpen = true, onClose 
               className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-2 group"
             >
               <ChevronRight
-                className={`w-4 h-4 transition-transform ${isListExpanded ? 'rotate-90' : ''}`}
+                className={`w-4 h-4 transition-transform ${isListExpanded ? "rotate-90" : ""}`}
               />
-              <span>
-                {isListExpanded ? 'Hide' : 'Show'} color details
-              </span>
+              <span>{isListExpanded ? "Hide" : "Show"} color details</span>
             </button>
 
-            <div className={`space-y-2 transition-all ${isListExpanded ? 'block' : 'hidden'}`}>
+            <div
+              className={`space-y-2 transition-all ${isListExpanded ? "block" : "hidden"}`}
+            >
               {palette.colors.map((color, index) => (
                 <div
                   key={`color-${index}`}
@@ -205,7 +238,7 @@ const PaletteDetailDialog = ({ palette = defaultPalette, isOpen = true, onClose 
                     <div className="flex flex-col justify-center">
                       <span className="font-mono">{color}</span>
                       <span className="font-mono text-sm text-gray-500">
-                        rgb({hexToRgb(color, false).join(', ')})
+                        rgb({hexToRgb(color, false).join(", ")})
                       </span>
                     </div>
                   </div>
@@ -221,7 +254,7 @@ const PaletteDetailDialog = ({ palette = defaultPalette, isOpen = true, onClose 
                       <Copy className="w-4 h-4" />
                     )}
                     <span className="ml-2">
-                      {copiedIndex === index ? 'Copied!' : 'Copy'}
+                      {copiedIndex === index ? "Copied!" : "Copy"}
                     </span>
                   </Button>
                 </div>
@@ -232,7 +265,11 @@ const PaletteDetailDialog = ({ palette = defaultPalette, isOpen = true, onClose 
           <div>
             <h3 className="text-lg font-semibold mt-8 mb-4">Colorblindness</h3>
 
-            <Tabs defaultValue="achromatopsia" value={selectedView} onValueChange={setSelectedView}>
+            <Tabs
+              defaultValue="achromatopsia"
+              value={selectedView}
+              onValueChange={setSelectedView}
+            >
               <TabsList className="mb-4">
                 <TabsTrigger value="none">None</TabsTrigger>
                 <TabsTrigger value="achromatopsia">Achromatopsia</TabsTrigger>
@@ -243,12 +280,17 @@ const PaletteDetailDialog = ({ palette = defaultPalette, isOpen = true, onClose 
 
               <TabsContent value="none">
                 <div className="text-sm text-gray-500 mt-1">
-                  Colors don't look the same to all people. Choose a type of color blindness above to simulate how the palette appears to people with this form of color vision deficiency.
+                  Colors don't look the same to all people. Choose a type of
+                  color blindness above to simulate how the palette appears to
+                  people with this form of color vision deficiency.
                 </div>
               </TabsContent>
 
               <TabsContent value="achromatopsia">
-                <ColorblindPreview colors={palette.colors} type="achromatopsia" />
+                <ColorblindPreview
+                  colors={palette.colors}
+                  type="achromatopsia"
+                />
                 <div className="text-sm text-gray-500 mt-1">
                   Complete color blindness; vision is entirely in grayscale.
                 </div>
@@ -257,21 +299,27 @@ const PaletteDetailDialog = ({ palette = defaultPalette, isOpen = true, onClose 
               <TabsContent value="protanopia">
                 <ColorblindPreview colors={palette.colors} type="protanopia" />
                 <div className="text-sm text-gray-500 mt-1">
-                  Red-blindness; difficulty distinguishing reds and greens due to lack of red cone function.
+                  Red-blindness; difficulty distinguishing reds and greens due
+                  to lack of red cone function.
                 </div>
               </TabsContent>
 
               <TabsContent value="deuteranopia">
-                <ColorblindPreview colors={palette.colors} type="deuteranopia" />
+                <ColorblindPreview
+                  colors={palette.colors}
+                  type="deuteranopia"
+                />
                 <div className="text-sm text-gray-500 mt-1">
-                  Green-blindness; difficulty distinguishing reds and greens due to lack of green cone function.
+                  Green-blindness; difficulty distinguishing reds and greens due
+                  to lack of green cone function.
                 </div>
               </TabsContent>
 
               <TabsContent value="tritanopia">
                 <ColorblindPreview colors={palette.colors} type="tritanopia" />
                 <div className="text-sm text-gray-500 mt-1">
-                  Blue-yellow blindness; difficulty distinguishing blues and yellows due to lack of blue cone function.
+                  Blue-yellow blindness; difficulty distinguishing blues and
+                  yellows due to lack of blue cone function.
                 </div>
               </TabsContent>
             </Tabs>
@@ -281,7 +329,13 @@ const PaletteDetailDialog = ({ palette = defaultPalette, isOpen = true, onClose 
             <h3 className="text-lg font-semibold mt-8 mb-4">Plot Previews</h3>
             <div className="grid grid-cols-3 gap-4">
               {plotTypes.map((type) => (
-                <Plot type={type} colors={simulateColorBlindnessArray(palette.colors, selectedView)} />
+                <Plot
+                  type={type}
+                  colors={simulateColorBlindnessArray(
+                    palette.colors,
+                    selectedView,
+                  )}
+                />
               ))}
             </div>
           </div>
