@@ -13,9 +13,9 @@ const PaletteDisplay = ({ palettes }) => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [plotType, setPlotType] = useState('mixed');
 
-  const plotTypeOptions = ['mixed', 'palette', 'bar', 'area', 'box', 'line', "map", "scatter"];
+  const plotTypeOptions = ['mixed', 'palette', 'bar', 'area', 'boxplot', 'line', "map", "scatter"];
   // Plot types to cycle through when plotType is set to 'mixed' (should not be a multiple of 3 ideally)
-  const mixedPlotTypes = ['bar', 'area', 'box', 'line', "scatter"]
+  const mixedPlotTypes = ['bar', 'area', 'boxplot', 'line', "scatter"]
 
   // Debounce search term
   useEffect(() => {
