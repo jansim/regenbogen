@@ -1,0 +1,16 @@
+{
+  "files": {
+    "ignore": [
+      "dist/**",
+      "R/**",
+      "src/components/**",
+      "src/lib/**",
+      "src/main.tsx",
+      "src/index.css",
+      "data/**"
+    ]
+  },
+  "formatter": {
+    "indentStyle": "space"
+  }
+}
