@@ -4,6 +4,7 @@ import { Check, Copy, ChevronRight } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useState } from 'react'
+import Plot from './Plot';
 
 const defaultPalette = {"package":"awtools","palette":"a_palette","length":8,"type":"sequential","id":"awtools::a_palette","colors":["#2A363B","#019875","#99B898","#FECEA8","#FF847C","#E84A5F","#C0392B","#96281B"]};
 
@@ -49,6 +50,9 @@ const hexToRgb = (hex, float = true) => {
 
 
 const simulateColorBlindness = (color, type) => {
+  if (type == "none") {
+    return color;
+  }
   if (!colorblindnessTypes[type]) {
     throw new Error(`Invalid color blindness type: ${type}`);
   }
@@ -71,6 +75,10 @@ const simulateColorBlindness = (color, type) => {
 
   return `#${toHex(newR)}${toHex(newG)}${toHex(newB)}`;
 };
+
+const simulateColorBlindnessArray = (colors, type) => {
+  return colors.map(color => simulateColorBlindness(color, type));
+}
 
 const ColorblindPreview = ({ colors, type }) => {
   const simulatedColors = colors.map(color => simulateColorBlindness(color, type));
@@ -96,8 +104,9 @@ const PaletteDetailDialog = ({ palette = defaultPalette, isOpen = true, onClose 
   const [showCopiedAll, setShowCopiedAll] = useState(false);
   const [isListExpanded, setIsListExpanded] = useState(false);
   const [copiedPreviewIndex, setCopiedPreviewIndex] = useState(null);
-  const [selectedView, setSelectedView] = useState('normal');
+  const [selectedView, setSelectedView] = useState('none');
 
+  const plotTypes = ['bar', 'line', 'scatter', 'area', 'boxplot', 'map'];
   const copyToClipboard = async (text, index = null, isPreview = false) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -123,7 +132,7 @@ const PaletteDetailDialog = ({ palette = defaultPalette, isOpen = true, onClose 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl overflow-auto" style={{ maxHeight: '95vh' }}>
+      <DialogContent className="max-w-4xl overflow-auto" style={{ maxHeight: '95vh' }}>
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">{palette.palette}</DialogTitle>
         </DialogHeader>
@@ -146,7 +155,6 @@ const PaletteDetailDialog = ({ palette = defaultPalette, isOpen = true, onClose 
               </Button>
             </div>
           </div>
-
 
           <div className="flex h-16 rounded-md overflow-hidden relative">
             {palette.colors.map((color, index) => (
@@ -221,13 +229,22 @@ const PaletteDetailDialog = ({ palette = defaultPalette, isOpen = true, onClose 
             </div>
           </div>
 
+          <h3 className="text-lg font-semibold mt-4">Colorblindness</h3>
+
           <Tabs defaultValue="achromatopsia" value={selectedView} onValueChange={setSelectedView}>
             <TabsList className="mb-4">
+              <TabsTrigger value="none">None</TabsTrigger>
               <TabsTrigger value="achromatopsia">Achromatopsia</TabsTrigger>
               <TabsTrigger value="protanopia">Protanopia</TabsTrigger>
               <TabsTrigger value="deuteranopia">Deuteranopia</TabsTrigger>
               <TabsTrigger value="tritanopia">Tritanopia</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="none">
+              <div className="text-sm text-gray-500 mt-1">
+                Colors don't look the same to all people. Choose a type of color blindness above to simulate how the palette appears to people with this form of color vision deficiency.
+              </div>
+            </TabsContent>
 
             <TabsContent value="achromatopsia">
               <ColorblindPreview colors={palette.colors} type="achromatopsia" />
@@ -257,6 +274,15 @@ const PaletteDetailDialog = ({ palette = defaultPalette, isOpen = true, onClose 
               </div>
             </TabsContent>
           </Tabs>
+
+          <div>
+            <h3 className="text-lg font-semibold mt-4">Plot Previews</h3>
+            <div className="grid grid-cols-3 gap-4">
+              {plotTypes.map((type) => (
+                <Plot type={type} colors={simulateColorBlindnessArray(palette.colors, selectedView)} />
+              ))}
+            </div>
+          </div>
 
           {showCopiedAll && (
             <Alert className="bg-green-50 text-green-700 border-green-200">
