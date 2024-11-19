@@ -27,6 +27,8 @@ const defaultPalette = {
     "#C0392B",
     "#96281B",
   ],
+  gh: "'awhstin/awtools'",
+  cran: false,
 };
 
 // Color blindness simulation matrices

@@ -12,7 +12,15 @@ palettes_d <- paletteer::palettes_d_names %>%
       as.character() %>%
       str_sub(1, 7) %>% # Remove alpha section
       list()
-  )
+  ) %>%
+  left_join(
+    paletteer::paletteer_packages %>%
+      janitor::clean_names() %>%
+      select(name, github, cran),
+    by = c("package" = "name")
+  ) %>%
+  select(-id) %>%
+  rename(gh = github)
 
 palettes_d %>%
   jsonlite::write_json("src/data/palettes_d.json")
