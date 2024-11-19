@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -6,11 +6,15 @@ import PaletteDetailDialog from './my-components/PaletteDetailDialog';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import Plot from './my-components/Plot'
 
-const PaletteDisplay = ({ palettes, plotType = "bar" }) => {
+const PaletteDisplay = ({ palettes }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedPalette, setSelectedPalette] = useState(null);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [plotType, setPlotType] = useState('bar');
+
+  // Plot type options
+  const plotTypeOptions = ['palette', 'bar', 'area', 'box', 'line', "map", "scatter"];
 
   // Debounce search term
   useEffect(() => {
@@ -36,12 +40,12 @@ const PaletteDisplay = ({ palettes, plotType = "bar" }) => {
   }, [palettes, debouncedSearchTerm, selectedType]);
 
   // Calculate the number of columns based on viewport width
-  const getColumnCount = () => {
+  const getColumnCount = useCallback(() => {
     if (typeof window === 'undefined') return 3;
     if (window.innerWidth < 768) return 1;
     if (window.innerWidth < 1024) return 2;
     return 3;
-  };
+  }, []);
 
   const [columnCount, setColumnCount] = useState(getColumnCount());
 
@@ -53,17 +57,26 @@ const PaletteDisplay = ({ palettes, plotType = "bar" }) => {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [getColumnCount]);
 
   // Calculate rows for virtualization
   const rowCount = Math.ceil(filteredPalettes.length / columnCount);
 
-  // Set up virtualizer using window scroll
+  // Dynamically adjust estimated row height based on plot type
+  const getEstimatedRowHeight = useCallback(() => {
+    return plotType === 'palette' ? 160 : 400;
+  }, [plotType]);
+
+  // Key change: include plotType in dependencies to force re-creation when plot type changes
   const virtualizer = useWindowVirtualizer({
     count: rowCount,
-    estimateSize: () => 400, // Estimated row height
+    estimateSize: () => getEstimatedRowHeight(),
     overscan: 5,
   });
+
+  useEffect(() => {
+    virtualizer.measure();
+  }, [plotType]);
 
   // URL hash handling
   useEffect(() => {
@@ -122,6 +135,18 @@ const PaletteDisplay = ({ palettes, plotType = "bar" }) => {
                   ))}
                 </SelectContent>
               </Select>
+              <Select value={plotType} onValueChange={setPlotType}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select plot type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {plotTypeOptions.map(type => (
+                    <SelectItem key={type} value={type}>
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
@@ -173,7 +198,7 @@ const PaletteDisplay = ({ palettes, plotType = "bar" }) => {
                       </CardHeader>
                       <CardContent>
                         {
-                          plotType == "palette" ? (
+                          plotType === "palette" ? (
                             <div className="flex h-12 rounded-md overflow-hidden">
                               {palette.colors.map((color, index) => (
                                 <div
