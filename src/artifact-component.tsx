@@ -11,10 +11,11 @@ const PaletteDisplay = ({ palettes }) => {
   const [selectedType, setSelectedType] = useState('all');
   const [selectedPalette, setSelectedPalette] = useState(null);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
-  const [plotType, setPlotType] = useState('bar');
+  const [plotType, setPlotType] = useState('mixed');
 
-  // Plot type options
-  const plotTypeOptions = ['palette', 'bar', 'area', 'box', 'line', "map", "scatter"];
+  const plotTypeOptions = ['mixed', 'palette', 'bar', 'area', 'box', 'line', "map", "scatter"];
+  // Plot types to cycle through when plotType is set to 'mixed' (should not be a multiple of 3 ideally)
+  const mixedPlotTypes = ['bar', 'area', 'box', 'line', "scatter"]
 
   // Debounce search term
   useEffect(() => {
@@ -179,7 +180,7 @@ const PaletteDisplay = ({ palettes }) => {
                   height: `${virtualRow.size}px`,
                 }}
               >
-                {rowPalettes.map((palette) => (
+                {rowPalettes.map((palette, paletteIndexInRow) => (
                   <a
                     onClick={(e) => handlePaletteSelect(e, palette)}
                     key={palette.id}
@@ -210,7 +211,7 @@ const PaletteDisplay = ({ palettes }) => {
                               ))}
                             </div>
                           ) : (
-                            <Plot colors={palette.colors} type={plotType}></Plot>
+                            <Plot colors={palette.colors} type={plotType === "mixed" ? mixedPlotTypes[(startIndex + paletteIndexInRow) % mixedPlotTypes.length] : plotType}></Plot>
                           )
                         }
                       </CardContent>
