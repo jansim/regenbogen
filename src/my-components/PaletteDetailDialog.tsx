@@ -163,19 +163,43 @@ const PaletteDetailDialog = ({
         style={{ maxHeight: "95vh" }}
       >
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">
-            {palette.palette}
+          <DialogTitle className="text-3xl">
+          <span className="text-gray-400 font-light">{palette.package}::</span><span className="font-semibold">{palette.palette}</span>
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm text-gray-500">
-                  &#123;{palette.package}&#125; • {palette.length} colors •{" "}
-                  {palette.type}
-                </p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-4">
+                  {palette.gh && (
+                    <a
+                      href={`https://github.com/${palette.gh}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                    >
+                      <Github className="w-4 h-4" />
+                      {palette.gh}
+                    </a>
+                  )}
+                  {palette.cran && (
+                    <a
+                      href={`https://cran.r-project.org/package=${palette.package}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                    >
+                      <span className="font-bold">R</span>
+                      CRAN: &#123;{palette.package}&#125;
+                    </a>
+                  )}
+                  <p className="text-sm text-gray-500">
+                    {palette.length} colors •{" "}
+                    {palette.type}
+                  </p>
+                </div>
               </div>
               <div className="flex gap-2">
                 <Button
@@ -191,31 +215,6 @@ const PaletteDetailDialog = ({
                   Copy All
                 </Button>
               </div>
-            </div>
-
-            <div className="flex gap-4">
-              {palette.gh && (
-                <a
-                  href={`https://github.com/${palette.gh}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
-                >
-                  <Github className="w-4 h-4" />
-                  {palette.gh}
-                </a>
-              )}
-              {palette.cran && (
-                <a
-                  href={`https://cran.r-project.org/package=${palette.package}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
-                >
-                  <span className="font-bold">R</span>
-                  CRAN: {palette.package}
-                </a>
-              )}
             </div>
           </div>
 
