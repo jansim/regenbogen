@@ -1,4 +1,4 @@
-import { simulateColorBlindness } from '@/colorBlindness';
+import { simulateColorBlindness } from "@/colorBlindness";
 
 const ColorblindPreview = ({ colors, type }) => {
   const simulatedColors = colors.map((color) =>

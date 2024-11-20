@@ -10,9 +10,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useState } from "react";
 import Plot from "./Plot";
-import { hexToRgb, simulateColorBlindnessArray } from "@/colorBlindness"
-import ColorblindPreview from "./ColorBlindPreview"
-import { generateCodePython, generateCodeR } from "@/codeGeneration"
+import { hexToRgb, simulateColorBlindnessArray } from "@/colorBlindness";
+import ColorblindPreview from "./ColorBlindPreview";
+import { generateCodePython, generateCodeR } from "@/codeGeneration";
 
 const defaultPalette = {
   package: "awtools",
@@ -34,7 +34,6 @@ const defaultPalette = {
   cran: false,
 };
 
-
 const PaletteDetailDialog = ({
   palette = defaultPalette,
   isOpen = true,
@@ -50,13 +49,15 @@ const PaletteDetailDialog = ({
 
   const plotTypes = ["bar", "line", "scatter", "area", "boxplot", "map"];
 
-  const [copiedCodeExample, setCopiedCodeExample] = useState<string | null>(null);
+  const [copiedCodeExample, setCopiedCodeExample] = useState<string | null>(
+    null,
+  );
 
   const copyToClipboard = async (
     text,
     index: number | null = null,
     isPreview = false,
-    codeType: string | null = null
+    codeType: string | null = null,
   ) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -91,7 +92,10 @@ const PaletteDetailDialog = ({
       >
         <DialogHeader>
           <DialogTitle className="text-3xl">
-          <span className="text-gray-400 font-light">{palette.package}::</span><span className="font-semibold">{palette.palette}</span>
+            <span className="text-gray-400 font-light">
+              {palette.package}::
+            </span>
+            <span className="font-semibold">{palette.palette}</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -123,8 +127,7 @@ const PaletteDetailDialog = ({
                     </a>
                   )}
                   <p className="text-sm text-gray-500">
-                    {palette.length} colors •{" "}
-                    {palette.type}
+                    {palette.length} colors • {palette.type}
                   </p>
                 </div>
               </div>
@@ -309,15 +312,19 @@ const PaletteDetailDialog = ({
             <TabsContent value="r" className="relative">
               <div className="relative">
                 <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
-                  <code className="text-sm font-mono">{generateCodeR(palette)}</code>
+                  <code className="text-sm font-mono">
+                    {generateCodeR(palette)}
+                  </code>
                 </pre>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => copyToClipboard(generateCodeR(palette), null, false, 'r')}
+                  onClick={() =>
+                    copyToClipboard(generateCodeR(palette), null, false, "r")
+                  }
                   className="absolute top-2 right-2"
                 >
-                  {copiedCodeExample === 'r' ? (
+                  {copiedCodeExample === "r" ? (
                     <Check className="w-4 h-4 text-green-500" />
                   ) : (
                     <Copy className="w-4 h-4" />
@@ -329,15 +336,24 @@ const PaletteDetailDialog = ({
             <TabsContent value="python" className="relative">
               <div className="relative">
                 <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
-                  <code className="text-sm font-mono">{generateCodePython(palette)}</code>
+                  <code className="text-sm font-mono">
+                    {generateCodePython(palette)}
+                  </code>
                 </pre>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => copyToClipboard(generateCodePython(palette), null, false, 'python')}
+                  onClick={() =>
+                    copyToClipboard(
+                      generateCodePython(palette),
+                      null,
+                      false,
+                      "python",
+                    )
+                  }
                   className="absolute top-2 right-2"
                 >
-                  {copiedCodeExample === 'python' ? (
+                  {copiedCodeExample === "python" ? (
                     <Check className="w-4 h-4 text-green-500" />
                   ) : (
                     <Copy className="w-4 h-4" />
@@ -350,9 +366,7 @@ const PaletteDetailDialog = ({
 
         {showCopiedAll && (
           <Alert className="bg-green-50 text-green-700 border-green-200">
-            <AlertDescription>
-              All colors copied to clipboard!
-            </AlertDescription>
+            <AlertDescription>All colors copied to clipboard!</AlertDescription>
           </Alert>
         )}
       </DialogContent>
