@@ -12,6 +12,7 @@ import { useState } from "react";
 import Plot from "./Plot";
 import { hexToRgb, simulateColorBlindnessArray } from "@/colorBlindness"
 import ColorblindPreview from "./ColorBlindPreview"
+import { generateCodePython, generateCodeR } from "@/codeGeneration"
 
 const defaultPalette = {
   package: "awtools",
@@ -81,58 +82,6 @@ const PaletteDetailDialog = ({
     const colorsList = palette.colors.join(", ");
     copyToClipboard(colorsList);
   };
-
-  const getRCode = () => {
-    if (palette.cran) {
-      return `# Install the package if needed
-install.packages("${palette.package}")
-library(${palette.package})
-
-# Use the palette
-${palette.palette}(${palette.length})
-
-# Use with ggplot2
-library(ggplot2)
-ggplot(data, aes(x, y, fill = group)) +
-  scale_fill_manual(values = ${palette.palette}(${palette.length}))`;
-    } else if (palette.gh) {
-      return `# Install from GitHub
-remotes::install_github("${palette.gh}")
-library(${palette.package})
-
-# Use the palette
-${palette.palette}(${palette.length})
-
-# Use with ggplot2
-library(ggplot2)
-ggplot(data, aes(x, y, fill = group)) +
-  scale_fill_manual(values = ${palette.palette}(${palette.length}))`;
-    }
-    return "";
-  };
-
-  const getPythonCode = () => `# Define the color palette
-colors = ${JSON.stringify(palette.colors, null, 2)}
-
-# Use with Matplotlib
-import matplotlib.pyplot as plt
-
-# For sequential data
-plt.style.use('default')
-for i, color in enumerate(colors):
-    plt.plot(data[i], color=color)
-
-# For categorical data
-plt.bar(x, height, color=colors)
-
-# Use with Seaborn
-import seaborn as sns
-
-# Set palette for all plots
-sns.set_palette(colors)
-
-# Or use in specific plots
-sns.barplot(data=df, x='category', y='value', palette=colors)`;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -360,12 +309,12 @@ sns.barplot(data=df, x='category', y='value', palette=colors)`;
             <TabsContent value="r" className="relative">
               <div className="relative">
                 <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
-                  <code className="text-sm font-mono">{getRCode()}</code>
+                  <code className="text-sm font-mono">{generateCodeR(palette)}</code>
                 </pre>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => copyToClipboard(getRCode(), null, false, 'r')}
+                  onClick={() => copyToClipboard(generateCodeR(palette), null, false, 'r')}
                   className="absolute top-2 right-2"
                 >
                   {copiedCodeExample === 'r' ? (
@@ -380,12 +329,12 @@ sns.barplot(data=df, x='category', y='value', palette=colors)`;
             <TabsContent value="python" className="relative">
               <div className="relative">
                 <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
-                  <code className="text-sm font-mono">{getPythonCode()}</code>
+                  <code className="text-sm font-mono">{generateCodePython(palette)}</code>
                 </pre>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => copyToClipboard(getPythonCode(), null, false, 'python')}
+                  onClick={() => copyToClipboard(generateCodePython(palette), null, false, 'python')}
                   className="absolute top-2 right-2"
                 >
                   {copiedCodeExample === 'python' ? (
