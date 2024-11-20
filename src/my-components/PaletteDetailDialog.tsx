@@ -5,7 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Check, Copy, ChevronRight } from "lucide-react";
+import { Check, Copy, ChevronRight, Github } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useState } from "react";
@@ -128,6 +128,7 @@ const PaletteDetailDialog = ({
   const [selectedView, setSelectedView] = useState("none");
 
   const plotTypes = ["bar", "line", "scatter", "area", "boxplot", "map"];
+
   const copyToClipboard = async (
     text,
     index: number | null = null,
@@ -168,26 +169,53 @@ const PaletteDetailDialog = ({
         </DialogHeader>
 
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-sm text-gray-500">
-                &#123;{palette.package}&#125; • {palette.length} colors •{" "}
-                {palette.type}
-              </p>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm text-gray-500">
+                  &#123;{palette.package}&#125; • {palette.length} colors •{" "}
+                  {palette.type}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={copyAllColors}
+                  className="flex items-center gap-2"
+                >
+                  {showCopiedAll ? (
+                    <Check className="w-4 h-4" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
+                  Copy All
+                </Button>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={copyAllColors}
-                className="flex items-center gap-2"
-              >
-                {showCopiedAll ? (
-                  <Check className="w-4 h-4" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-                Copy All
-              </Button>
+
+            <div className="flex gap-4">
+              {palette.gh && (
+                <a
+                  href={`https://github.com/${palette.gh.replace(/'/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                >
+                  <Github className="w-4 h-4" />
+                  View on GitHub
+                </a>
+              )}
+              {palette.cran && (
+                <a
+                  href={`https://cran.r-project.org/package=${palette.package}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                >
+                  <span className="font-bold">R</span>
+                  View on CRAN
+                </a>
+              )}
             </div>
           </div>
 
@@ -332,6 +360,7 @@ const PaletteDetailDialog = ({
             <div className="grid grid-cols-3 gap-4">
               {plotTypes.map((type) => (
                 <Plot
+                  key={type}
                   type={type}
                   colors={simulateColorBlindnessArray(
                     palette.colors,
