@@ -27,7 +27,7 @@ const defaultPalette = {
     "#C0392B",
     "#96281B",
   ],
-  gh: "'awhstin/awtools'",
+  gh: "awhstin/awtools",
   cran: false,
 };
 
@@ -196,13 +196,13 @@ const PaletteDetailDialog = ({
             <div className="flex gap-4">
               {palette.gh && (
                 <a
-                  href={`https://github.com/${palette.gh.replace(/'/g, '')}`}
+                  href={`https://github.com/${palette.gh}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
                 >
                   <Github className="w-4 h-4" />
-                  View on GitHub
+                  {palette.gh}
                 </a>
               )}
               {palette.cran && (
@@ -213,7 +213,7 @@ const PaletteDetailDialog = ({
                   className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
                 >
                   <span className="font-bold">R</span>
-                  View on CRAN
+                  CRAN: {palette.package}
                 </a>
               )}
             </div>
