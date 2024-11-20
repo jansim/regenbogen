@@ -49,14 +49,20 @@ const PaletteDetailDialog = ({
 
   const plotTypes = ["bar", "line", "scatter", "area", "boxplot", "map"];
 
+  const [copiedCodeExample, setCopiedCodeExample] = useState<string | null>(null);
+
   const copyToClipboard = async (
     text,
     index: number | null = null,
     isPreview = false,
+    codeType: string | null = null
   ) => {
     try {
       await navigator.clipboard.writeText(text);
-      if (isPreview) {
+      if (codeType) {
+        setCopiedCodeExample(codeType);
+        setTimeout(() => setCopiedCodeExample(null), 1000);
+      } else if (isPreview) {
         setCopiedPreviewIndex(index);
         setTimeout(() => setCopiedPreviewIndex(null), 1000);
       } else if (index !== null) {
@@ -75,6 +81,58 @@ const PaletteDetailDialog = ({
     const colorsList = palette.colors.join(", ");
     copyToClipboard(colorsList);
   };
+
+  const getRCode = () => {
+    if (palette.cran) {
+      return `# Install the package if needed
+install.packages("${palette.package}")
+library(${palette.package})
+
+# Use the palette
+${palette.palette}(${palette.length})
+
+# Use with ggplot2
+library(ggplot2)
+ggplot(data, aes(x, y, fill = group)) +
+  scale_fill_manual(values = ${palette.palette}(${palette.length}))`;
+    } else if (palette.gh) {
+      return `# Install from GitHub
+remotes::install_github("${palette.gh}")
+library(${palette.package})
+
+# Use the palette
+${palette.palette}(${palette.length})
+
+# Use with ggplot2
+library(ggplot2)
+ggplot(data, aes(x, y, fill = group)) +
+  scale_fill_manual(values = ${palette.palette}(${palette.length}))`;
+    }
+    return "";
+  };
+
+  const getPythonCode = () => `# Define the color palette
+colors = ${JSON.stringify(palette.colors, null, 2)}
+
+# Use with Matplotlib
+import matplotlib.pyplot as plt
+
+# For sequential data
+plt.style.use('default')
+for i, color in enumerate(colors):
+    plt.plot(data[i], color=color)
+
+# For categorical data
+plt.bar(x, height, color=colors)
+
+# Use with Seaborn
+import seaborn as sns
+
+# Set palette for all plots
+sns.set_palette(colors)
+
+# Or use in specific plots
+sns.barplot(data=df, x='category', y='value', palette=colors)`;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -289,15 +347,65 @@ const PaletteDetailDialog = ({
               ))}
             </div>
           </div>
-
-          {showCopiedAll && (
-            <Alert className="bg-green-50 text-green-700 border-green-200">
-              <AlertDescription>
-                All colors copied to clipboard!
-              </AlertDescription>
-            </Alert>
-          )}
         </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mt-8 mb-4">Code Examples</h3>
+          <Tabs defaultValue="r">
+            <TabsList className="mb-4">
+              <TabsTrigger value="r">R</TabsTrigger>
+              <TabsTrigger value="python">Python</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="r" className="relative">
+              <div className="relative">
+                <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
+                  <code className="text-sm font-mono">{getRCode()}</code>
+                </pre>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => copyToClipboard(getRCode(), null, false, 'r')}
+                  className="absolute top-2 right-2"
+                >
+                  {copiedCodeExample === 'r' ? (
+                    <Check className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="python" className="relative">
+              <div className="relative">
+                <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
+                  <code className="text-sm font-mono">{getPythonCode()}</code>
+                </pre>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => copyToClipboard(getPythonCode(), null, false, 'python')}
+                  className="absolute top-2 right-2"
+                >
+                  {copiedCodeExample === 'python' ? (
+                    <Check className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
+                </Button>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {showCopiedAll && (
+          <Alert className="bg-green-50 text-green-700 border-green-200">
+            <AlertDescription>
+              All colors copied to clipboard!
+            </AlertDescription>
+          </Alert>
+        )}
       </DialogContent>
     </Dialog>
   );
