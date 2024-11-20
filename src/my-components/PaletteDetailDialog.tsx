@@ -303,7 +303,7 @@ const PaletteDetailDialog = ({
 
         <div>
           <h3 className="text-lg font-semibold mt-8 mb-4">Code Examples</h3>
-          <Tabs defaultValue="r">
+          <Tabs defaultValue="r_palletteer">
             <TabsList className="mb-4">
               <TabsTrigger value="r_palletteer">R</TabsTrigger>
               <TabsTrigger value="r_manual">R (manual)</TabsTrigger>
