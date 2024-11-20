@@ -40,7 +40,7 @@ colors <- c(
 `;
   }
 
-  code += "\n# Credit the original palette"
+  code += "\n# Credit the original palette";
   if (palette.cran) {
     code += `citation(package="${palette.package}")`;
   } else if (palette.gh) {

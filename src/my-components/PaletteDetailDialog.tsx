@@ -321,7 +321,12 @@ const PaletteDetailDialog = ({
                   variant="ghost"
                   size="sm"
                   onClick={() =>
-                    copyToClipboard(generateCodeR(palette, "paletteer"), null, false, "r")
+                    copyToClipboard(
+                      generateCodeR(palette, "paletteer"),
+                      null,
+                      false,
+                      "r",
+                    )
                   }
                   className="absolute top-2 right-2"
                 >
@@ -338,14 +343,19 @@ const PaletteDetailDialog = ({
               <div className="relative">
                 <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
                   <code className="text-sm font-mono">
-                    {generateCodeR(palette,  "manual")}
+                    {generateCodeR(palette, "manual")}
                   </code>
                 </pre>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() =>
-                    copyToClipboard(generateCodeR(palette, "manual"), null, false, "r")
+                    copyToClipboard(
+                      generateCodeR(palette, "manual"),
+                      null,
+                      false,
+                      "r",
+                    )
                   }
                   className="absolute top-2 right-2"
                 >
