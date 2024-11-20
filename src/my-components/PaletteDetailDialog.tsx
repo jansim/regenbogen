@@ -305,22 +305,47 @@ const PaletteDetailDialog = ({
           <h3 className="text-lg font-semibold mt-8 mb-4">Code Examples</h3>
           <Tabs defaultValue="r">
             <TabsList className="mb-4">
-              <TabsTrigger value="r">R</TabsTrigger>
+              <TabsTrigger value="r_palletteer">R</TabsTrigger>
+              <TabsTrigger value="r_manual">R (manual)</TabsTrigger>
               <TabsTrigger value="python">Python</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="r" className="relative">
+            <TabsContent value="r_palletteer" className="relative">
               <div className="relative">
                 <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
                   <code className="text-sm font-mono">
-                    {generateCodeR(palette)}
+                    {generateCodeR(palette, "paletteer")}
                   </code>
                 </pre>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() =>
-                    copyToClipboard(generateCodeR(palette), null, false, "r")
+                    copyToClipboard(generateCodeR(palette, "paletteer"), null, false, "r")
+                  }
+                  className="absolute top-2 right-2"
+                >
+                  {copiedCodeExample === "r" ? (
+                    <Check className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="r_manual" className="relative">
+              <div className="relative">
+                <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
+                  <code className="text-sm font-mono">
+                    {generateCodeR(palette,  "manual")}
+                  </code>
+                </pre>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() =>
+                    copyToClipboard(generateCodeR(palette, "manual"), null, false, "r")
                   }
                   className="absolute top-2 right-2"
                 >
