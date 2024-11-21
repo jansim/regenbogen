@@ -87,8 +87,7 @@ const PaletteDetailDialog = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="max-w-4xl overflow-auto md:w-[95vw] max-h-[95vh] md:w-auto"
-        style={{ maxHeight: "95vh" }}
+        className="max-w-4xl overflow-auto sm:w-[95vw] max-h-[100vh] sm:max-h-[95vh]"
       >
         <DialogHeader>
           <DialogTitle className="text-xl md:text-3xl">
@@ -231,7 +230,7 @@ const PaletteDetailDialog = ({
               value={selectedView}
               onValueChange={setSelectedView}
             >
-              <TabsList className="mb-4 w-full flex-wrap">
+              <TabsList className="mb-4 w-full flex-wrap h-auto">
                 <TabsTrigger value="none" className="flex-1">None</TabsTrigger>
                 <TabsTrigger value="achromatopsia" className="flex-1">Achromatopsia</TabsTrigger>
                 <TabsTrigger value="protanopia" className="flex-1">Protanopia</TabsTrigger>
