@@ -295,7 +295,7 @@ const PaletteDetailDialog = ({
 
           <div>
             <h3 className="text-lg font-semibold mt-8 mb-4">Plot Previews</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {plotTypes.map((type) => (
                 <Plot
                   key={type}
