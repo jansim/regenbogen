@@ -87,11 +87,11 @@ const PaletteDetailDialog = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="max-w-4xl overflow-auto"
+        className="max-w-4xl overflow-auto md:w-[95vw] max-h-[95vh] md:w-auto"
         style={{ maxHeight: "95vh" }}
       >
         <DialogHeader>
-          <DialogTitle className="text-3xl">
+          <DialogTitle className="text-xl md:text-3xl">
             <span className="text-gray-400 font-light">
               {palette.package}::
             </span>
@@ -99,51 +99,53 @@ const PaletteDetailDialog = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-6 overflow-y-auto pr-2">
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-2">
-                <div className="flex items-center gap-4">
-                  {palette.gh && (
-                    <a
-                      href={`https://github.com/${palette.gh}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="space-y-2 w-full">
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                  <div className="flex flex-wrap items-center gap-4">
+                    {palette.gh && (
+                      <a
+                        href={`https://github.com/${palette.gh}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                      >
+                        <Github className="w-4 h-4" />
+                        {palette.gh}
+                      </a>
+                    )}
+                    {palette.cran && (
+                      <a
+                        href={`https://cran.r-project.org/package=${palette.package}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                      >
+                        <span className="font-bold">R</span>
+                        CRAN: &#123;{palette.package}&#125;
+                      </a>
+                    )}
+                    <p className="text-sm text-gray-500">
+                      {palette.length} colors • {palette.type}
+                    </p>
+                  </div>
+                  <div className="ml-auto">
+                    <Button
+                      variant="outline"
+                      onClick={copyAllColors}
+                      className="flex items-center gap-2 w-full"
                     >
-                      <Github className="w-4 h-4" />
-                      {palette.gh}
-                    </a>
-                  )}
-                  {palette.cran && (
-                    <a
-                      href={`https://cran.r-project.org/package=${palette.package}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
-                    >
-                      <span className="font-bold">R</span>
-                      CRAN: &#123;{palette.package}&#125;
-                    </a>
-                  )}
-                  <p className="text-sm text-gray-500">
-                    {palette.length} colors • {palette.type}
-                  </p>
+                      {showCopiedAll ? (
+                        <Check className="w-4 h-4" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                      Copy All
+                    </Button>
+                  </div>
                 </div>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={copyAllColors}
-                  className="flex items-center gap-2"
-                >
-                  {showCopiedAll ? (
-                    <Check className="w-4 h-4" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
-                  Copy All
-                </Button>
               </div>
             </div>
           </div>
@@ -187,16 +189,16 @@ const PaletteDetailDialog = ({
               {palette.colors.map((color, index) => (
                 <div
                   key={`color-${index}`}
-                  className="flex items-center p-2 rounded-lg hover:bg-gray-50"
+                  className="flex flex-col md:flex-row items-center p-2 rounded-lg hover:bg-gray-50 gap-2"
                 >
-                  <div className="flex gap-2 flex-1">
+                  <div className="flex gap-2 flex-1 w-full">
                     <div
-                      className="w-12 h-12 rounded-md"
+                      className="w-12 h-12 rounded-md shrink-0"
                       style={{ backgroundColor: color }}
                     />
-                    <div className="flex flex-col justify-center">
-                      <span className="font-mono">{color}</span>
-                      <span className="font-mono text-sm text-gray-500">
+                    <div className="flex flex-col justify-center overflow-hidden">
+                      <span className="font-mono truncate">{color}</span>
+                      <span className="font-mono text-sm text-gray-500 truncate">
                         rgb({hexToRgb(color, false).join(", ")})
                       </span>
                     </div>
@@ -205,7 +207,7 @@ const PaletteDetailDialog = ({
                     variant="ghost"
                     size="sm"
                     onClick={() => copyToClipboard(color, index)}
-                    className="w-24"
+                    className="w-full md:w-24"
                   >
                     {copiedIndex === index ? (
                       <Check className="w-4 h-4 text-green-500" />
@@ -229,12 +231,12 @@ const PaletteDetailDialog = ({
               value={selectedView}
               onValueChange={setSelectedView}
             >
-              <TabsList className="mb-4">
-                <TabsTrigger value="none">None</TabsTrigger>
-                <TabsTrigger value="achromatopsia">Achromatopsia</TabsTrigger>
-                <TabsTrigger value="protanopia">Protanopia</TabsTrigger>
-                <TabsTrigger value="deuteranopia">Deuteranopia</TabsTrigger>
-                <TabsTrigger value="tritanopia">Tritanopia</TabsTrigger>
+              <TabsList className="mb-4 w-full flex-wrap">
+                <TabsTrigger value="none" className="flex-1">None</TabsTrigger>
+                <TabsTrigger value="achromatopsia" className="flex-1">Achromatopsia</TabsTrigger>
+                <TabsTrigger value="protanopia" className="flex-1">Protanopia</TabsTrigger>
+                <TabsTrigger value="deuteranopia" className="flex-1">Deuteranopia</TabsTrigger>
+                <TabsTrigger value="tritanopia" className="flex-1">Tritanopia</TabsTrigger>
               </TabsList>
 
               <TabsContent value="none">
@@ -286,7 +288,7 @@ const PaletteDetailDialog = ({
 
           <div>
             <h3 className="text-lg font-semibold mt-8 mb-4">Plot Previews</h3>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {plotTypes.map((type) => (
                 <Plot
                   key={type}
@@ -299,78 +301,77 @@ const PaletteDetailDialog = ({
               ))}
             </div>
           </div>
-        </div>
 
-        <div>
-          <h3 className="text-lg font-semibold mt-8 mb-4">Code Examples</h3>
-          <Tabs defaultValue="r_palletteer">
-            <TabsList className="mb-4">
-              <TabsTrigger value="r_palletteer">R</TabsTrigger>
-              <TabsTrigger value="r_manual">R (manual)</TabsTrigger>
-              <TabsTrigger value="python">Python</TabsTrigger>
-            </TabsList>
+          <div>
+            <h3 className="text-lg font-semibold mt-8 mb-4">Code Examples</h3>
+            <Tabs defaultValue="r_palletteer">
+              <TabsList className="mb-4 w-full flex-wrap">
+                <TabsTrigger value="r_palletteer" className="flex-1">R</TabsTrigger>
+                <TabsTrigger value="r_manual" className="flex-1">R (manual)</TabsTrigger>
+                <TabsTrigger value="python" className="flex-1">Python</TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="r_palletteer" className="relative">
-              <div className="relative">
-                <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
-                  <code className="text-sm font-mono">
-                    {generateCodeR(palette, "paletteer")}
-                  </code>
-                </pre>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() =>
-                    copyToClipboard(
-                      generateCodeR(palette, "paletteer"),
-                      null,
-                      false,
-                      "r",
-                    )
-                  }
-                  className="absolute top-2 right-2"
-                >
-                  {copiedCodeExample === "r" ? (
-                    <Check className="w-4 h-4 text-green-500" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
-                </Button>
-              </div>
-            </TabsContent>
+              <TabsContent value="r_palletteer" className="relative">
+                <div className="relative">
+                  <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto max-h-64 overflow-y-auto">
+                    <code className="text-sm font-mono break-words whitespace-pre-wrap">
+                      {generateCodeR(palette, "paletteer")}
+                    </code>
+                  </pre>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      copyToClipboard(
+                        generateCodeR(palette, "paletteer"),
+                        null,
+                        false,
+                        "r",
+                      )
+                    }
+                    className="absolute top-2 right-2"
+                  >
+                    {copiedCodeExample === "r" ? (
+                      <Check className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+              </TabsContent>
 
-            <TabsContent value="r_manual" className="relative">
-              <div className="relative">
-                <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
-                  <code className="text-sm font-mono">
-                    {generateCodeR(palette, "manual")}
-                  </code>
-                </pre>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() =>
-                    copyToClipboard(
-                      generateCodeR(palette, "manual"),
-                      null,
-                      false,
-                      "r",
-                    )
-                  }
-                  className="absolute top-2 right-2"
-                >
-                  {copiedCodeExample === "r" ? (
-                    <Check className="w-4 h-4 text-green-500" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
-                </Button>
-              </div>
-            </TabsContent>
+              <TabsContent value="r_manual" className="relative">
+                <div className="relative">
+                  <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto max-h-64 overflow-y-auto">
+                    <code className="text-sm font-mono break-words whitespace-pre-wrap">
+                      {generateCodeR(palette, "manual")}
+                    </code>
+                  </pre>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      copyToClipboard(
+                        generateCodeR(palette, "manual"),
+                        null,
+                        false,
+                        "r",
+                      )
+                    }
+                    className="absolute top-2 right-2"
+                  >
+                    {copiedCodeExample === "r" ? (
+                      <Check className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+              </TabsContent>
 
-            <TabsContent value="python" className="relative">
-              <div className="relative">
-                <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
+              <TabsContent value="python" className="relative">
+                <div className="relative">
+                  <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
                   <code className="text-sm font-mono">
                     {generateCodePython(palette)}
                   </code>
@@ -397,6 +398,7 @@ const PaletteDetailDialog = ({
               </div>
             </TabsContent>
           </Tabs>
+        </div>
         </div>
 
         {showCopiedAll && (
