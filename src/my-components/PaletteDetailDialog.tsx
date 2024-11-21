@@ -86,9 +86,7 @@ const PaletteDetailDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent
-        className="max-w-4xl overflow-auto sm:w-[95vw] max-h-[100vh] sm:max-h-[95vh]"
-      >
+      <DialogContent className="max-w-4xl overflow-auto sm:w-[95vw] max-h-[100vh] sm:max-h-[95vh]">
         <DialogHeader>
           <DialogTitle className="text-xl md:text-3xl">
             <span className="text-gray-400 font-light">
@@ -231,11 +229,21 @@ const PaletteDetailDialog = ({
               onValueChange={setSelectedView}
             >
               <TabsList className="mb-4 w-full flex-wrap h-auto">
-                <TabsTrigger value="none" className="flex-1">None</TabsTrigger>
-                <TabsTrigger value="achromatopsia" className="flex-1">Achromatopsia</TabsTrigger>
-                <TabsTrigger value="protanopia" className="flex-1">Protanopia</TabsTrigger>
-                <TabsTrigger value="deuteranopia" className="flex-1">Deuteranopia</TabsTrigger>
-                <TabsTrigger value="tritanopia" className="flex-1">Tritanopia</TabsTrigger>
+                <TabsTrigger value="none" className="flex-1">
+                  None
+                </TabsTrigger>
+                <TabsTrigger value="achromatopsia" className="flex-1">
+                  Achromatopsia
+                </TabsTrigger>
+                <TabsTrigger value="protanopia" className="flex-1">
+                  Protanopia
+                </TabsTrigger>
+                <TabsTrigger value="deuteranopia" className="flex-1">
+                  Deuteranopia
+                </TabsTrigger>
+                <TabsTrigger value="tritanopia" className="flex-1">
+                  Tritanopia
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="none">
@@ -305,9 +313,15 @@ const PaletteDetailDialog = ({
             <h3 className="text-lg font-semibold mt-8 mb-4">Code Examples</h3>
             <Tabs defaultValue="r_palletteer">
               <TabsList className="mb-4 w-full flex-wrap">
-                <TabsTrigger value="r_palletteer" className="flex-1">R</TabsTrigger>
-                <TabsTrigger value="r_manual" className="flex-1">R (manual)</TabsTrigger>
-                <TabsTrigger value="python" className="flex-1">Python</TabsTrigger>
+                <TabsTrigger value="r_palletteer" className="flex-1">
+                  R
+                </TabsTrigger>
+                <TabsTrigger value="r_manual" className="flex-1">
+                  R (manual)
+                </TabsTrigger>
+                <TabsTrigger value="python" className="flex-1">
+                  Python
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="r_palletteer" className="relative">
@@ -371,33 +385,33 @@ const PaletteDetailDialog = ({
               <TabsContent value="python" className="relative">
                 <div className="relative">
                   <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
-                  <code className="text-sm font-mono">
-                    {generateCodePython(palette)}
-                  </code>
-                </pre>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() =>
-                    copyToClipboard(
-                      generateCodePython(palette),
-                      null,
-                      false,
-                      "python",
-                    )
-                  }
-                  className="absolute top-2 right-2"
-                >
-                  {copiedCodeExample === "python" ? (
-                    <Check className="w-4 h-4 text-green-500" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
-                </Button>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
+                    <code className="text-sm font-mono">
+                      {generateCodePython(palette)}
+                    </code>
+                  </pre>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      copyToClipboard(
+                        generateCodePython(palette),
+                        null,
+                        false,
+                        "python",
+                      )
+                    }
+                    className="absolute top-2 right-2"
+                  >
+                    {copiedCodeExample === "python" ? (
+                      <Check className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
 
         {showCopiedAll && (
