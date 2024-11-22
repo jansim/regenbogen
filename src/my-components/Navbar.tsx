@@ -1,4 +1,6 @@
+import React from "react";
 import PaletteArc from "./PaletteArc";
+import { Github } from "lucide-react";
 
 export const Navbar = () => {
   return (
@@ -11,8 +13,18 @@ export const Navbar = () => {
               <PaletteArc width={60} arcWidth={11} />
             </div>
           </h1>
+          <a
+            href="https://github.com/yourusername/regenbogen"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-700 hover:text-black hover:scale-110 transition-all duration-200 ease-in-out"
+          >
+            <Github size={24} />
+          </a>
         </div>
       </div>
     </div>
   );
 };
+
+export default Navbar;
