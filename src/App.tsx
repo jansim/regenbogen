@@ -1,6 +1,7 @@
 import "./App.css";
 import Artifact from "./artifact-component";
 import palettes_d from "./data/palettes_d.json";
+import { Navbar } from "./my-components/Navbar";
 
 const palettes = palettes_d
   // Generate IDs
@@ -14,6 +15,7 @@ const palettes = palettes_d
 function App() {
   return (
     <>
+      <Navbar />
       <Artifact palettes={palettes} />
     </>
   );

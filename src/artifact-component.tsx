@@ -133,55 +133,41 @@ const PaletteDisplay = ({ palettes }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="fixed top-0 left-0 right-0 bg-white border-b z-10 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="h-20 flex items-center justify-between">
-            <h1 className="text-3xl font-bold">
-              Regenbogen
-              <img
-                className="w-12 ml-3 inline-block relative"
-                src="logo.svg"
-                style={{ bottom: "0.12em" }}
-              />
-            </h1>
-            <div className="flex gap-4">
-              <Input
-                placeholder="Search palettes..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-64"
-              />
-              <Select value={selectedType} onValueChange={setSelectedType}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {paletteTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type.charAt(0).toUpperCase() + type.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={plotType} onValueChange={setPlotType}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select plot type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {plotTypeOptions.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type.charAt(0).toUpperCase() + type.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="max-w-7xl mx-auto px-6">
         <div className="h-24" />
+
+        <div className="flex gap-4 mb-6">
+          <Input
+            placeholder="Search palettes..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-64"
+          />
+          <Select value={selectedType} onValueChange={setSelectedType}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select type" />
+            </SelectTrigger>
+            <SelectContent>
+              {paletteTypes.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={plotType} onValueChange={setPlotType}>
+            <SelectTrigger className="w-[180px] ml-auto">
+              <SelectValue placeholder="Select plot type" />
+            </SelectTrigger>
+            <SelectContent>
+              {plotTypeOptions.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+      </div>
 
         <p className="text-sm text-gray-500 mb-4 lg:text-center">
           Showing {filteredPalettes.length} of {palettes.length} palettes
