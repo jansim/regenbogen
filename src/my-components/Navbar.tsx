@@ -13,7 +13,7 @@ export const Navbar = () => {
             </div>
           </h1>
           <a
-            href="https://github.com/yourusername/regenbogen"
+            href="https://github.com/jansim/regenbogen"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-700 hover:text-black hover:scale-110 transition-all duration-200 ease-in-out"
