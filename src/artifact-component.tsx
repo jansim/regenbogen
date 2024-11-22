@@ -1,10 +1,14 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { ChartArea, ChartCandlestick, ChartColumnBig, ChartLine, ChartScatter, Dices, Map, SwatchBook } from "lucide-react";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -19,16 +23,6 @@ const PaletteDisplay = ({ palettes }) => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [plotType, setPlotType] = useState("palette");
 
-  const plotTypeOptions = [
-    "palette",
-    "mixed",
-    "bar",
-    "area",
-    "boxplot",
-    "line",
-    "map",
-    "scatter",
-  ];
   // Plot types to cycle through when plotType is set to 'mixed' (should not be a multiple of 3 ideally)
   const mixedPlotTypes = ["bar", "area", "boxplot", "line", "scatter"];
 
@@ -160,11 +154,18 @@ const PaletteDisplay = ({ palettes }) => {
               <SelectValue placeholder="Select plot type" />
             </SelectTrigger>
             <SelectContent>
-              {plotTypeOptions.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </SelectItem>
-              ))}
+              <SelectItem value="palette"> <SwatchBook className="inline-block mr-2"/> Palette </SelectItem>
+              <SelectSeparator></SelectSeparator>
+              <SelectGroup>
+                <SelectLabel>Charts</SelectLabel>
+                <SelectItem value="mixed"> <Dices className="inline-block mr-2"/> Mixed </SelectItem>
+                <SelectItem value="bar"> <ChartColumnBig className="inline-block mr-2"/> Bar </SelectItem>
+                <SelectItem value="area"> <ChartArea className="inline-block mr-2"/> Area </SelectItem>
+                <SelectItem value="boxplot"> <ChartCandlestick className="inline-block mr-2"/> Boxplot </SelectItem>
+                <SelectItem value="line"> <ChartLine className="inline-block mr-2"/> Line </SelectItem>
+                <SelectItem value="map"> <Map className="inline-block mr-2"/> Map </SelectItem>
+                <SelectItem value="scatter"> <ChartScatter className="inline-block mr-2"/> Scatter </SelectItem>
+              </SelectGroup>
             </SelectContent>
           </Select>
       </div>
