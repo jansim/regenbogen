@@ -326,7 +326,7 @@ const PaletteDetailDialog = ({
 
               <TabsContent value="r_palletteer" className="relative">
                 <div className="relative">
-                  <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto max-h-64 overflow-y-auto">
+                  <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
                     <code className="text-sm font-mono break-words whitespace-pre-wrap">
                       {generateCodeR(palette, "paletteer")}
                     </code>
@@ -355,7 +355,7 @@ const PaletteDetailDialog = ({
 
               <TabsContent value="r_manual" className="relative">
                 <div className="relative">
-                  <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto max-h-64 overflow-y-auto">
+                  <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
                     <code className="text-sm font-mono break-words whitespace-pre-wrap">
                       {generateCodeR(palette, "manual")}
                     </code>
