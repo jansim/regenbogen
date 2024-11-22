@@ -82,15 +82,16 @@ const PaletteDisplay = ({ palettes }) => {
   const rowCount = Math.ceil(filteredPalettes.length / columnCount);
 
   // Dynamically adjust estimated row height based on plot type
-  const getEstimatedRowHeight = useCallback(() => {
+  const getEstimatedRowHeight = () => {
     return plotType === "palette" ? 160 : 400;
-  }, [plotType]);
+  };
 
   // Key change: include plotType in dependencies to force re-creation when plot type changes
   const virtualizer = useWindowVirtualizer({
     count: rowCount,
     estimateSize: () => getEstimatedRowHeight(),
     overscan: 5,
+    gap: 24,
   });
 
   useEffect(() => {
@@ -204,9 +205,10 @@ const PaletteDisplay = ({ palettes }) => {
               <div
                 key={virtualRow.index}
                 className={`absolute left-0 w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid-shifted`}
+                ref={virtualizer.measureElement}
+                data-index={virtualRow.index}
                 style={{
                   transform: `translateY(${virtualRow.start}px)`,
-                  height: `${virtualRow.size}px`,
                 }}
               >
                 {rowPalettes.map((palette, paletteIndexInRow) => (
