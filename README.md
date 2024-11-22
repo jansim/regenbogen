@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="The Regenbogen Logo" src="public/logo.svg" width="60%" align="center">
+  <img alt="The Regenbogen Logo" src="logo.svg" width="60%" align="center">
 </p>
 
 # Regenbogen
