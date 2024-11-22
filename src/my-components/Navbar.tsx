@@ -1,4 +1,3 @@
-import React from "react";
 import PaletteArc from "./PaletteArc";
 import { Github } from "lucide-react";
 
