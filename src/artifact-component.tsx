@@ -1,6 +1,11 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  RadioGroup,
+  RadioGroupItem
+} from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { ChartArea, ChartCandlestick, ChartColumnBig, ChartLine, ChartScatter, Dices, Map, SwatchBook } from "lucide-react";
 import {
   Select,
@@ -18,7 +23,7 @@ import Plot from "./my-components/Plot";
 
 const PaletteDisplay = ({ palettes }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState("all");
+  const [selectedType, setSelectedType] = useState("qualitative");
   const [selectedPalette, setSelectedPalette] = useState(null);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [plotType, setPlotType] = useState("palette");
@@ -35,10 +40,7 @@ const PaletteDisplay = ({ palettes }) => {
   }, [searchTerm]);
 
   // Memoize palette types for select dropdown
-  const paletteTypes: string[] = useMemo(
-    () => ["all", ...new Set(palettes.map((p) => p.type))],
-    [palettes],
-  ) as any;
+  const paletteTypes = ["all", "qualitative", "divergent", "sequential"];
 
   // Memoize filtered palettes
   const filteredPalettes = useMemo(() => {
@@ -130,44 +132,56 @@ const PaletteDisplay = ({ palettes }) => {
       <div className="max-w-7xl mx-auto px-6">
         <div className="h-24" />
 
-        <div className="flex gap-4 mb-6">
+        <div className="flex flex-wrap gap-4 mb-6 justify-center">
           <Input
             placeholder="Search palettes..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-64"
           />
-          <Select value={selectedType} onValueChange={setSelectedType}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select type" />
-            </SelectTrigger>
-            <SelectContent>
+          <div className="lg:order-3">
+            <Select value={plotType} onValueChange={setPlotType}>
+              <SelectTrigger className="w-[180px] ml-auto">
+                <SelectValue placeholder="Select plot type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="palette"> <SwatchBook className="inline-block mr-2"/> Palette </SelectItem>
+                <SelectSeparator></SelectSeparator>
+                <SelectGroup>
+                  <SelectLabel>Charts</SelectLabel>
+                  <SelectItem value="mixed"> <Dices className="inline-block mr-2"/> Mixed </SelectItem>
+                  <SelectItem value="bar"> <ChartColumnBig className="inline-block mr-2"/> Bar </SelectItem>
+                  <SelectItem value="area"> <ChartArea className="inline-block mr-2"/> Area </SelectItem>
+                  <SelectItem value="boxplot"> <ChartCandlestick className="inline-block mr-2"/> Boxplot </SelectItem>
+                  <SelectItem value="line"> <ChartLine className="inline-block mr-2"/> Line </SelectItem>
+                  <SelectItem value="map"> <Map className="inline-block mr-2"/> Map </SelectItem>
+                  <SelectItem value="scatter"> <ChartScatter className="inline-block mr-2"/> Scatter </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex mx-auto flex-wrap">
+            <div className="flex items-center space-x-2 mx-auto text-sm text-gray-500">
+              Palette Type
+            </div>
+            <RadioGroup
+              value={selectedType}
+              onValueChange={setSelectedType}
+              className="flex mx-3 space-x-2"
+            >
               {paletteTypes.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </SelectItem>
+                <div key={type} className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    value={type}
+                    id={`type-${type}`}
+                  />
+                  <Label htmlFor={`type-${type}`} className="capitalize cursor-pointer">
+                    {type}
+                  </Label>
+                </div>
               ))}
-            </SelectContent>
-          </Select>
-          <Select value={plotType} onValueChange={setPlotType}>
-            <SelectTrigger className="w-[180px] ml-auto">
-              <SelectValue placeholder="Select plot type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="palette"> <SwatchBook className="inline-block mr-2"/> Palette </SelectItem>
-              <SelectSeparator></SelectSeparator>
-              <SelectGroup>
-                <SelectLabel>Charts</SelectLabel>
-                <SelectItem value="mixed"> <Dices className="inline-block mr-2"/> Mixed </SelectItem>
-                <SelectItem value="bar"> <ChartColumnBig className="inline-block mr-2"/> Bar </SelectItem>
-                <SelectItem value="area"> <ChartArea className="inline-block mr-2"/> Area </SelectItem>
-                <SelectItem value="boxplot"> <ChartCandlestick className="inline-block mr-2"/> Boxplot </SelectItem>
-                <SelectItem value="line"> <ChartLine className="inline-block mr-2"/> Line </SelectItem>
-                <SelectItem value="map"> <Map className="inline-block mr-2"/> Map </SelectItem>
-                <SelectItem value="scatter"> <ChartScatter className="inline-block mr-2"/> Scatter </SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+            </RadioGroup>
+          </div>
       </div>
 
         <p className="text-sm text-gray-500 mb-4 lg:text-center">
