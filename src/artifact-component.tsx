@@ -1,12 +1,18 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  RadioGroup,
-  RadioGroupItem
-} from "@/components/ui/radio-group";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { ChartArea, ChartCandlestick, ChartColumnBig, ChartLine, ChartScatter, Dices, Map, SwatchBook } from "lucide-react";
+import {
+  ChartArea,
+  ChartCandlestick,
+  ChartColumnBig,
+  ChartLine,
+  ChartScatter,
+  Dices,
+  Map,
+  SwatchBook,
+} from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -145,17 +151,41 @@ const PaletteDisplay = ({ palettes }) => {
                 <SelectValue placeholder="Select plot type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="palette"> <SwatchBook className="inline-block mr-2"/> Palette </SelectItem>
+                <SelectItem value="palette">
+                  {" "}
+                  <SwatchBook className="inline-block mr-2" /> Palette{" "}
+                </SelectItem>
                 <SelectSeparator></SelectSeparator>
                 <SelectGroup>
                   <SelectLabel>Charts</SelectLabel>
-                  <SelectItem value="mixed"> <Dices className="inline-block mr-2"/> Mixed </SelectItem>
-                  <SelectItem value="bar"> <ChartColumnBig className="inline-block mr-2"/> Bar </SelectItem>
-                  <SelectItem value="area"> <ChartArea className="inline-block mr-2"/> Area </SelectItem>
-                  <SelectItem value="boxplot"> <ChartCandlestick className="inline-block mr-2"/> Boxplot </SelectItem>
-                  <SelectItem value="line"> <ChartLine className="inline-block mr-2"/> Line </SelectItem>
-                  <SelectItem value="map"> <Map className="inline-block mr-2"/> Map </SelectItem>
-                  <SelectItem value="scatter"> <ChartScatter className="inline-block mr-2"/> Scatter </SelectItem>
+                  <SelectItem value="mixed">
+                    {" "}
+                    <Dices className="inline-block mr-2" /> Mixed{" "}
+                  </SelectItem>
+                  <SelectItem value="bar">
+                    {" "}
+                    <ChartColumnBig className="inline-block mr-2" /> Bar{" "}
+                  </SelectItem>
+                  <SelectItem value="area">
+                    {" "}
+                    <ChartArea className="inline-block mr-2" /> Area{" "}
+                  </SelectItem>
+                  <SelectItem value="boxplot">
+                    {" "}
+                    <ChartCandlestick className="inline-block mr-2" /> Boxplot{" "}
+                  </SelectItem>
+                  <SelectItem value="line">
+                    {" "}
+                    <ChartLine className="inline-block mr-2" /> Line{" "}
+                  </SelectItem>
+                  <SelectItem value="map">
+                    {" "}
+                    <Map className="inline-block mr-2" /> Map{" "}
+                  </SelectItem>
+                  <SelectItem value="scatter">
+                    {" "}
+                    <ChartScatter className="inline-block mr-2" /> Scatter{" "}
+                  </SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -171,18 +201,18 @@ const PaletteDisplay = ({ palettes }) => {
             >
               {paletteTypes.map((type) => (
                 <div key={type} className="flex items-center space-x-2">
-                  <RadioGroupItem
-                    value={type}
-                    id={`type-${type}`}
-                  />
-                  <Label htmlFor={`type-${type}`} className="capitalize cursor-pointer">
+                  <RadioGroupItem value={type} id={`type-${type}`} />
+                  <Label
+                    htmlFor={`type-${type}`}
+                    className="capitalize cursor-pointer"
+                  >
                     {type}
                   </Label>
                 </div>
               ))}
             </RadioGroup>
           </div>
-      </div>
+        </div>
 
         <p className="text-sm text-gray-500 mb-4 lg:text-center">
           Showing {filteredPalettes.length} of {palettes.length} palettes
