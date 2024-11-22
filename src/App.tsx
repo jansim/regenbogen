@@ -1,6 +1,7 @@
 import "./App.css";
 import Artifact from "./artifact-component";
 import palettes_d from "./data/palettes_d.json";
+import Footer from "./my-components/Footer";
 import { Navbar } from "./my-components/Navbar";
 
 const palettes = palettes_d
@@ -17,6 +18,7 @@ function App() {
     <>
       <Navbar />
       <Artifact palettes={palettes} />
+      <Footer />
     </>
   );
 }
