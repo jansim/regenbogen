@@ -1,4 +1,4 @@
-const ArcColorPalette = () => {
+const PaletteArc = ({ width = 50, arcWidth = 10 }) => {
   const colors = [
     "#2A363BFF",
     "#019875FF",
@@ -11,11 +11,9 @@ const ArcColorPalette = () => {
   ];
 
   // SVG dimensions
-  const width = 50;
-  const height = 25;
+  const height = width / 2;
   const centerX = width / 2;
   const centerY = height;
-  const arcWidth = 9;
   const radius = Math.min(width, height) - 5;
 
   // Calculate the angles for each color segment
@@ -64,4 +62,4 @@ const ArcColorPalette = () => {
   );
 };
 
-export default ArcColorPalette;
+export default PaletteArc;
