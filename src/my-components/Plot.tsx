@@ -1,3 +1,4 @@
+import { resizeArray } from "@/resizeArray";
 import svgTemplates from "./svgTemplates";
 
 const Plot = ({
@@ -14,13 +15,7 @@ const Plot = ({
     return null;
   }
 
-  let effectiveColors = colors;
-  while (effectiveColors.length < 5) {
-    // Repeat colors if there are less than 5
-    effectiveColors = effectiveColors.concat(
-      colors.slice(0, 5 - colors.length),
-    );
-  }
+  const effectiveColors = resizeArray(colors, 5);
 
   const modifiedSvg = svgTemplates[type]
     .replaceAll("#0000F0", effectiveColors[0])
