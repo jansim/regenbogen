@@ -42,7 +42,7 @@ colors <- c(
 
   code += "\n# Credit the original palette";
   if (palette.cran) {
-    code += `citation(package="${palette.package}")`;
+    code += `\ncitation(package="${palette.package}")`;
   } else if (palette.gh) {
     code += "\n# Source: https://github.com/" + palette.gh;
   }
