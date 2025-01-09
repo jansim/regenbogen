@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="The Regenbogen Logo" src="img/logo.svg" width="45%" align="center">
+  <img alt="The Regenbogen Logo" src="img/logo.svg" width="25%" align="center">
 </p>
 
 # Regenbogen: Color Palettes for Data Visualization
@@ -12,9 +12,9 @@ You can use the deployed online version at [simson.io/regenbogen/](https://simso
 
 ## Screenshots 🌬️
 
-![Desktop screenshot showing different palettes.](img/screenshot-desktop.png)
-
 ![Combination of differently sized screenshots.](img/screenshots-combined.png)
+
+![Desktop screenshot showing different palettes.](img/screenshot-desktop.png)
 
 ## Context 🌤️
 
