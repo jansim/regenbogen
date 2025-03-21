@@ -51,9 +51,13 @@ const PaletteDisplay = ({ palettes }) => {
   // Memoize filtered palettes
   const filteredPalettes = useMemo(() => {
     return palettes.filter((palette) => {
-      const matchesSearch = palette.palette
-        .toLowerCase()
-        .includes(debouncedSearchTerm.toLowerCase());
+      const matchesSearch =
+        palette.palette
+          .toLowerCase()
+          .includes(debouncedSearchTerm.toLowerCase()) ||
+        palette.package
+          ?.toLowerCase()
+          .includes(debouncedSearchTerm.toLowerCase());
       const matchesType =
         selectedType === "all" || palette.type === selectedType;
       return matchesSearch && matchesType;
