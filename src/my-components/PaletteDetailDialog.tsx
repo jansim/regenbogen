@@ -32,6 +32,7 @@ const defaultPalette = {
   ],
   gh: "awhstin/awtools",
   cran: false,
+  pltr: false,
 };
 
 const PaletteDetailDialog = ({
@@ -311,11 +312,13 @@ const PaletteDetailDialog = ({
 
           <div>
             <h3 className="text-lg font-semibold mt-8 mb-4">Code Examples</h3>
-            <Tabs defaultValue="r_palletteer">
+            <Tabs defaultValue={palette.pltr ? "r_palletteer" : "r_manual"}>
               <TabsList className="mb-4 w-full flex-wrap">
-                <TabsTrigger value="r_palletteer" className="flex-1">
-                  R
-                </TabsTrigger>
+                {palette.pltr && (
+                  <TabsTrigger value="r_palletteer" className="flex-1">
+                    R
+                  </TabsTrigger>
+                )}
                 <TabsTrigger value="r_manual" className="flex-1">
                   R (manual)
                 </TabsTrigger>
@@ -324,34 +327,36 @@ const PaletteDetailDialog = ({
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="r_palletteer" className="relative">
-                <div className="relative">
-                  <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
-                    <code className="text-sm font-mono break-words whitespace-pre-wrap">
-                      {generateCodeR(palette, "paletteer")}
-                    </code>
-                  </pre>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      copyToClipboard(
-                        generateCodeR(palette, "paletteer"),
-                        null,
-                        false,
-                        "r",
-                      )
-                    }
-                    className="absolute top-2 right-2"
-                  >
-                    {copiedCodeExample === "r" ? (
-                      <Check className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-              </TabsContent>
+              {palette.pltr && (
+                <TabsContent value="r_palletteer" className="relative">
+                  <div className="relative">
+                    <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
+                      <code className="text-sm font-mono break-words whitespace-pre-wrap">
+                        {generateCodeR(palette, "paletteer")}
+                      </code>
+                    </pre>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        copyToClipboard(
+                          generateCodeR(palette, "paletteer"),
+                          null,
+                          false,
+                          "r",
+                        )
+                      }
+                      className="absolute top-2 right-2"
+                    >
+                      {copiedCodeExample === "r" ? (
+                        <Check className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+                </TabsContent>
+              )}
 
               <TabsContent value="r_manual" className="relative">
                 <div className="relative">
