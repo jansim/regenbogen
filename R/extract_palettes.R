@@ -1,6 +1,6 @@
 library(tidyverse)
 
-palettes_d <- paletteer::palettes_d_names %>%
+palettes_d_paletteer <- paletteer::palettes_d_names %>%
   select(-novelty) %>%
   mutate(
     id = paste0(package, "::", palette)
@@ -20,7 +20,32 @@ palettes_d <- paletteer::palettes_d_names %>%
     by = c("package" = "name")
   ) %>%
   select(-id) %>%
-  rename(gh = github)
+  rename(gh = github) %>%
+  mutate(
+    # Supported in paletteer
+    pltr = TRUE
+  )
+
+palettes_d_peRsian <- peRsian::persian_palettes |>
+  enframe(name = "palette", value = "colors") |>
+  mutate(
+    package = "peRsian",
+    length = colors |> lapply(length),
+    type = "qualitative",
+    gh = "jan-yegi/peRsian",
+    cran = FALSE,
+    # Not supported in paletteer
+    pltr = FALSE
+  )
+
+palettes_d_extra <- rbind(
+  palettes_d_peRsian
+)
+
+palettes_d <- rbind(
+  palettes_d_paletteer,
+  palettes_d_extra
+)
 
 palettes_d %>%
   jsonlite::write_json("src/data/palettes_d.json")
