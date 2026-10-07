@@ -3,6 +3,7 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   ChartArea,
   ChartCandlestick,
@@ -10,6 +11,7 @@ import {
   ChartLine,
   ChartScatter,
   Dices,
+  Eye,
   Map,
   SwatchBook,
 } from "lucide-react";
@@ -26,6 +28,8 @@ import {
 import PaletteDetailDialog from "./my-components/PaletteDetailDialog";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import Plot from "./my-components/Plot";
+import { useColorblindScores } from "./useColorblindScores";
+import { isColorblindFriendly } from "./colorblindCheck";
 
 const PaletteDisplay = ({ palettes }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -33,6 +37,10 @@ const PaletteDisplay = ({ palettes }) => {
   const [selectedPalette, setSelectedPalette] = useState(null);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [plotType, setPlotType] = useState("palette");
+  const [colorblindOnly, setColorblindOnly] = useState(false);
+
+  const { scores: colorblindScores, done: colorblindScoresDone } =
+    useColorblindScores(palettes);
 
   // Plot types to cycle through when plotType is set to 'mixed' (should not be a multiple of 3 ideally)
   const mixedPlotTypes = ["bar", "area", "boxplot", "line", "scatter"];
@@ -48,6 +56,14 @@ const PaletteDisplay = ({ palettes }) => {
   // Memoize palette types for select dropdown
   const paletteTypes = ["all", "qualitative", "divergent", "sequential"];
 
+  const colorblindFriendlyIds = useMemo(() => {
+    const ids = new Set<string>();
+    colorblindScores.forEach((score, id) => {
+      if (isColorblindFriendly(score)) ids.add(id);
+    });
+    return ids;
+  }, [colorblindScores]);
+
   // Memoize filtered palettes
   const filteredPalettes = useMemo(() => {
     return palettes.filter((palette) => {
@@ -60,9 +76,17 @@ const PaletteDisplay = ({ palettes }) => {
           .includes(debouncedSearchTerm.toLowerCase());
       const matchesType =
         selectedType === "all" || palette.type === selectedType;
-      return matchesSearch && matchesType;
+      const matchesColorblind =
+        !colorblindOnly || colorblindFriendlyIds.has(palette.id);
+      return matchesSearch && matchesType && matchesColorblind;
     });
-  }, [palettes, debouncedSearchTerm, selectedType]);
+  }, [
+    palettes,
+    debouncedSearchTerm,
+    selectedType,
+    colorblindOnly,
+    colorblindFriendlyIds,
+  ]);
 
   // Calculate the number of columns based on viewport width
   const getColumnCount = useCallback(() => {
@@ -216,10 +240,31 @@ const PaletteDisplay = ({ palettes }) => {
               ))}
             </RadioGroup>
           </div>
+          <div className="flex items-center space-x-2 lg:order-4">
+            <Switch
+              id="colorblind-only"
+              checked={colorblindOnly}
+              onCheckedChange={setColorblindOnly}
+            />
+            <Label
+              htmlFor="colorblind-only"
+              className="cursor-pointer flex items-center gap-1"
+              title="Only show palettes whose colors remain distinguishable under simulated deuteranopia, protanopia and tritanopia"
+            >
+              <Eye className="w-4 h-4" /> Colorblind friendly
+            </Label>
+          </div>
         </div>
 
         <p className="text-sm text-gray-500 mb-4 lg:text-center">
           Showing {filteredPalettes.length} of {palettes.length} palettes
+          {colorblindOnly && !colorblindScoresDone && (
+            <>
+              {" "}
+              (checking colorblind safety: {colorblindScores.size} of{" "}
+              {palettes.length} done)
+            </>
+          )}
         </p>
 
         <div
@@ -258,6 +303,13 @@ const PaletteDisplay = ({ palettes }) => {
                           <span className="text-sm text-gray-400 absolute top-1 right-0">
                             &#123;{palette.package}&#125; • {palette.length} •{" "}
                             {palette.type}
+                            {colorblindFriendlyIds.has(palette.id) && (
+                              <span title="Colorblind friendly">
+                                {" "}
+                                •{" "}
+                                <Eye className="inline-block w-4 h-4 -mt-0.5" />
+                              </span>
+                            )}
                           </span>
                           <span className="text-xl text-gray-600 relative inline-block bg-white pr-3">
                             {palette.palette}
