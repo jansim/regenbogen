@@ -7,6 +7,9 @@
 // colors of a palette are computed, exactly as done in the R package (incl.
 // the `spacesXYZ::DeltaE()` implementation of CIEDE2000). Results match the R
 // implementation up to floating point precision.
+//
+// The same simulations are used to render palettes as seen with color vision
+// deficiencies, so what is shown always matches what is scored.
 
 export type CvdType = "normal" | "deuteranopia" | "protanopia" | "tritanopia";
 
@@ -79,7 +82,7 @@ const linearToSRgb = (y: number): number => {
 };
 
 // Simulate a color vision deficiency, returns sRGB values (0-255, rounded)
-const simulateCvd = (
+const simulateCvdRgb = (
   rgb: [number, number, number],
   matrix: Matrix3,
 ): [number, number, number] => {
@@ -124,6 +127,38 @@ const rgbToLab = ([R, G, B]: [number, number, number]): Lab => {
   const zt = labF(Z / ZN);
   return [L, 500 * (xt - yt), 200 * (yt - zt)];
 };
+
+// Complete color blindness: remove all chroma but keep the luminance, as in
+// colorspace::desaturate(). Returns sRGB values (0-255, rounded).
+const desaturateRgb = (rgb: [number, number, number]) => {
+  const [L] = rgbToLab(rgb);
+  const Y = L > 8 ? ((L + 16) / 116) ** 3 : L / KAPPA;
+  const grey = Math.round(linearToSRgb(Math.min(1, Y) * 255));
+  return [grey, grey, grey] as [number, number, number];
+};
+
+export type SimulationType = Exclude<CvdType, "normal"> | "achromatopsia";
+
+const simulateRgb = (
+  rgb: [number, number, number],
+  type: SimulationType | "normal" | "none",
+): [number, number, number] => {
+  if (type === "normal" || type === "none") return rgb;
+  if (type === "achromatopsia") return desaturateRgb(rgb);
+  return simulateCvdRgb(rgb, cvdMatrices[type]);
+};
+
+const toHex = (rgb: [number, number, number]) =>
+  `#${rgb.map((v) => v.toString(16).padStart(2, "0").toUpperCase()).join("")}`;
+
+// Simulate how a color is seen with a color vision deficiency
+export const simulateColor = (
+  hex: string,
+  type: SimulationType | "normal" | "none",
+): string =>
+  type === "normal" || type === "none"
+    ? hex
+    : toHex(simulateRgb(parseHex(hex), type));
 
 const TWO_PI = 2 * Math.PI;
 const DEG = Math.PI / 180;
@@ -191,14 +226,9 @@ export const deltaE2000 = (lab1: Lab, lab2: Lab): number => {
 // Pairwise distances (upper triangle, flattened) between colors of a palette
 export const paletteDist = (
   colors: string[],
-  cvd: CvdType = "normal",
+  cvd: CvdType | "achromatopsia" = "normal",
 ): number[] => {
-  const labs = colors.map((hex) => {
-    const rgb = parseHex(hex);
-    return rgbToLab(
-      cvd === "normal" ? rgb : simulateCvd(rgb, cvdMatrices[cvd]),
-    );
-  });
+  const labs = colors.map((hex) => rgbToLab(simulateRgb(parseHex(hex), cvd)));
   const dists: number[] = [];
   for (let i = 0; i < labs.length; i++) {
     for (let j = i + 1; j < labs.length; j++) {
@@ -247,10 +277,11 @@ export const paletteCheck = (
 
 // Minimal ΔE2000 difference between colors a palette is required to have
 // under all simulated color vision deficiencies to be considered colorblind
-// friendly. The value was chosen such that established colorblind safe
-// palettes (e.g. Okabe-Ito with black, Paul Tol's bright / vibrant / muted) pass,
-// while e.g. Tableau 10 or ColorBrewer's Set2 / Dark2 / Paired do not.
-export const COLORBLIND_FRIENDLY_MIN_DIST = 8;
+// friendly. The value was chosen such that the Okabe-Ito palette, the de facto
+// standard for colorblind safe palettes, passes (its closest pair, reddish
+// purple vs. grey under deuteranopia, has a difference of 6.4), while e.g.
+// Tableau 10 or ColorBrewer's Set1 / Set2 / Dark2 / Paired clearly fail.
+export const COLORBLIND_FRIENDLY_MIN_DIST = 6.4;
 
 export interface ColorblindScore {
   // Minimal distance between any two colors with normal vision
@@ -275,6 +306,23 @@ export const colorblindScore = (colors: string[]): ColorblindScore => {
     tritanopia,
     cvd: Math.min(deuteranopia, protanopia, tritanopia),
   };
+};
+
+// The two most similar colors of a palette under a given simulation
+export const closestPair = (
+  colors: string[],
+  type: CvdType | "achromatopsia",
+): { i: number; j: number; dist: number } | null => {
+  const dists = paletteDist(colors, type);
+  if (dists.length === 0) return null;
+  let best = { i: 0, j: 1, dist: Infinity };
+  let k = 0;
+  for (let i = 0; i < colors.length; i++) {
+    for (let j = i + 1; j < colors.length; j++, k++) {
+      if (dists[k] < best.dist) best = { i, j, dist: dists[k] };
+    }
+  }
+  return best;
 };
 
 export const isColorblindFriendly = (

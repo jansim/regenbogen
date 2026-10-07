@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 import {
   ChartArea,
   ChartCandlestick,
@@ -13,6 +14,7 @@ import {
   Dices,
   Eye,
   Map,
+  SlidersHorizontal,
   SwatchBook,
 } from "lucide-react";
 import {
@@ -29,7 +31,10 @@ import PaletteDetailDialog from "./my-components/PaletteDetailDialog";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import Plot from "./my-components/Plot";
 import { useColorblindScores } from "./useColorblindScores";
-import { isColorblindFriendly } from "./colorblindCheck";
+import {
+  COLORBLIND_FRIENDLY_MIN_DIST,
+  isColorblindFriendly,
+} from "./colorblindCheck";
 
 const PaletteDisplay = ({ palettes }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -38,6 +43,8 @@ const PaletteDisplay = ({ palettes }) => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [plotType, setPlotType] = useState("palette");
   const [colorblindOnly, setColorblindOnly] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [sortBy, setSortBy] = useState("random");
 
   const { scores: colorblindScores, done: colorblindScoresDone } =
     useColorblindScores(palettes);
@@ -87,6 +94,17 @@ const PaletteDisplay = ({ palettes }) => {
     colorblindOnly,
     colorblindFriendlyIds,
   ]);
+
+  // Sort palettes (palettes are already shuffled, so "random" keeps the order)
+  const sortedPalettes = useMemo(() => {
+    if (sortBy !== "colorblind") return filteredPalettes;
+    // Palettes that are not yet checked or have a single color go last
+    const safety = (palette) => {
+      const score = colorblindScores.get(palette.id)?.cvd;
+      return score !== undefined && Number.isFinite(score) ? score : -1;
+    };
+    return [...filteredPalettes].sort((a, b) => safety(b) - safety(a));
+  }, [filteredPalettes, sortBy, colorblindScores]);
 
   // Calculate the number of columns based on viewport width
   const getColumnCount = useCallback(() => {
@@ -254,7 +272,47 @@ const PaletteDisplay = ({ palettes }) => {
               <Eye className="w-4 h-4" /> Colorblind friendly
             </Label>
           </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="lg:order-5 text-gray-500"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            aria-expanded={showAdvanced}
+          >
+            <SlidersHorizontal className="w-4 h-4 mr-2" /> Advanced
+          </Button>
         </div>
+
+        {showAdvanced && (
+          <div className="flex flex-wrap items-center justify-center gap-4 mb-6 p-4 rounded-lg border bg-white text-sm">
+            <Label htmlFor="sort-by" className="text-gray-500">
+              Sort by
+            </Label>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger id="sort-by" className="w-[220px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="random">
+                  <Dices className="inline-block mr-2 w-4 h-4" /> Random
+                </SelectItem>
+                <SelectItem value="colorblind">
+                  <Eye className="inline-block mr-2 w-4 h-4" /> Colorblind
+                  safety
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-gray-500 max-w-xl">
+              Colorblind safety is the smallest color difference (ΔE₀₀) between
+              any two colors of a palette under simulated deuteranopia,
+              protanopia and tritanopia. Palettes count as colorblind friendly
+              from {COLORBLIND_FRIENDLY_MIN_DIST}.
+              {sortBy === "colorblind" && !colorblindScoresDone && (
+                <> Still checking some palettes, these are shown last.</>
+              )}
+            </p>
+          </div>
+        )}
 
         <p className="text-sm text-gray-500 mb-4 lg:text-center">
           Showing {filteredPalettes.length} of {palettes.length} palettes
@@ -276,7 +334,7 @@ const PaletteDisplay = ({ palettes }) => {
         >
           {virtualizer.getVirtualItems().map((virtualRow) => {
             const startIndex = virtualRow.index * columnCount;
-            const rowPalettes = filteredPalettes.slice(
+            const rowPalettes = sortedPalettes.slice(
               startIndex,
               startIndex + columnCount,
             );

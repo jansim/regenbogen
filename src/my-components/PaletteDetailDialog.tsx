@@ -8,12 +8,40 @@ import { Button } from "@/components/ui/button";
 import { Check, Copy, ChevronRight, Github } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Plot from "./Plot";
 import { hexToRgb, simulateColorBlindnessArray } from "@/colorBlindness";
 import ColorblindPreview from "./ColorBlindPreview";
 import ColorblindCheck from "./ColorblindCheck";
 import { generateCodePython, generateCodeR } from "@/codeGeneration";
+import {
+  COLORBLIND_FRIENDLY_MIN_DIST,
+  paletteDist,
+  type SimulationType,
+} from "@/colorblindCheck";
+
+// Label for a colorblindness tab, incl. the minimum color difference
+const SimulationTabLabel = ({
+  name,
+  minDist,
+  checked = true,
+}: {
+  name: string;
+  minDist: number;
+  checked?: boolean;
+}) => (
+  <span className="flex flex-col items-center leading-tight">
+    <span>{name}</span>
+    {Number.isFinite(minDist) && (
+      <span
+        className={`text-xs font-mono ${!checked ? "text-gray-500" : minDist < COLORBLIND_FRIENDLY_MIN_DIST ? "text-amber-700" : "text-green-700"}`}
+        title="Minimum color difference (ΔE₀₀) between any two colors"
+      >
+        ΔE {minDist.toFixed(1)}
+      </span>
+    )}
+  </span>
+);
 
 const defaultPalette = {
   package: "awtools",
@@ -50,6 +78,25 @@ const PaletteDetailDialog = ({
   const [selectedView, setSelectedView] = useState("none");
 
   const plotTypes = ["bar", "line", "scatter", "area", "boxplot", "map"];
+
+  // Minimum color difference per form of colorblindness
+  const minDists = useMemo(() => {
+    const types: SimulationType[] = [
+      "achromatopsia",
+      "protanopia",
+      "deuteranopia",
+      "tritanopia",
+    ];
+    return Object.fromEntries(
+      types.map((type) => [
+        type,
+        paletteDist(palette.colors, type).reduce(
+          (min, d) => Math.min(min, d),
+          Infinity,
+        ),
+      ]),
+    ) as Record<SimulationType, number>;
+  }, [palette.colors]);
 
   const [copiedCodeExample, setCopiedCodeExample] = useState<string | null>(
     null,
@@ -237,16 +284,29 @@ const PaletteDetailDialog = ({
                   None
                 </TabsTrigger>
                 <TabsTrigger value="achromatopsia" className="flex-1">
-                  Achromatopsia
+                  <SimulationTabLabel
+                    name="Achromatopsia"
+                    minDist={minDists.achromatopsia}
+                    checked={false}
+                  />
                 </TabsTrigger>
                 <TabsTrigger value="protanopia" className="flex-1">
-                  Protanopia
+                  <SimulationTabLabel
+                    name="Protanopia"
+                    minDist={minDists.protanopia}
+                  />
                 </TabsTrigger>
                 <TabsTrigger value="deuteranopia" className="flex-1">
-                  Deuteranopia
+                  <SimulationTabLabel
+                    name="Deuteranopia"
+                    minDist={minDists.deuteranopia}
+                  />
                 </TabsTrigger>
                 <TabsTrigger value="tritanopia" className="flex-1">
-                  Tritanopia
+                  <SimulationTabLabel
+                    name="Tritanopia"
+                    minDist={minDists.tritanopia}
+                  />
                 </TabsTrigger>
               </TabsList>
 
