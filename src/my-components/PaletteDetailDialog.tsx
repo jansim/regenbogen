@@ -12,6 +12,7 @@ import { useState } from "react";
 import Plot from "./Plot";
 import { hexToRgb, simulateColorBlindnessArray } from "@/colorBlindness";
 import ColorblindPreview from "./ColorBlindPreview";
+import ColorblindCheck from "./ColorblindCheck";
 import { generateCodePython, generateCodeR } from "@/codeGeneration";
 
 const defaultPalette = {
@@ -223,6 +224,8 @@ const PaletteDetailDialog = ({
 
           <div>
             <h3 className="text-lg font-semibold mt-8 mb-4">Colorblindness</h3>
+
+            <ColorblindCheck colors={palette.colors} />
 
             <Tabs
               defaultValue="achromatopsia"
