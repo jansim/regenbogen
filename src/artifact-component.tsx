@@ -275,7 +275,7 @@ const PaletteDisplay = ({ palettes, plotType }) => {
               </Select>
             </div>
             <div className="flex items-center gap-3">
-              <Label className="text-gray-500 shrink-0">Colors</Label>
+              <Label className="text-gray-500 shrink-0">Palette Size</Label>
               <Slider
                 min={1}
                 max={MAX_COLORS}
@@ -283,7 +283,7 @@ const PaletteDisplay = ({ palettes, plotType }) => {
                 value={colorRange}
                 onValueChange={setColorRange}
                 className="min-w-[140px]"
-                aria-label="Number of colors"
+                aria-label="Palette size"
               />
               <span className="font-mono text-gray-500 w-14 shrink-0">
                 {colorRange[0]}–{colorRange[1]}

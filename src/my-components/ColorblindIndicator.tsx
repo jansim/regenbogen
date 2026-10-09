@@ -26,7 +26,7 @@ const ColorblindIndicator = ({
         }
       >
         {friendly ? (
-          <Check className={`${className} text-green-600`} />
+          <Check className={`${className} text-gray-400`} />
         ) : (
           <X className={`${className} text-gray-400`} />
         )}
