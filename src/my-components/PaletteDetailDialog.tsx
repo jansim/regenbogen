@@ -15,10 +15,11 @@ import ColorblindPreview from "./ColorBlindPreview";
 import ColorblindCheck from "./ColorblindCheck";
 import { generateCodePython, generateCodeR } from "@/codeGeneration";
 import {
-  COLORBLIND_FRIENDLY_MIN_DIST,
-  paletteDist,
+  isFriendlyDist,
+  minDist,
   type SimulationType,
 } from "@/colorblindCheck";
+import ColorblindIndicator from "./ColorblindIndicator";
 
 // Label for a colorblindness tab, incl. the minimum color difference
 const SimulationTabLabel = ({
@@ -28,16 +29,21 @@ const SimulationTabLabel = ({
 }: {
   name: string;
   minDist: number;
+  // Whether this form of colorblindness counts towards colorblind friendliness
   checked?: boolean;
 }) => (
   <span className="flex flex-col items-center leading-tight">
     <span>{name}</span>
     {Number.isFinite(minDist) && (
-      <span
-        className={`text-xs font-mono ${!checked ? "text-gray-500" : minDist < COLORBLIND_FRIENDLY_MIN_DIST ? "text-amber-700" : "text-green-700"}`}
-        title="Minimum color difference (ΔE₀₀) between any two colors"
-      >
+      <span className="flex items-center gap-0.5 text-xs font-mono text-gray-500">
         ΔE {minDist.toFixed(1)}
+        {checked && (
+          <ColorblindIndicator
+            friendly={isFriendlyDist(minDist)}
+            minDist={minDist}
+            className="w-3.5 h-3.5"
+          />
+        )}
       </span>
     )}
   </span>
@@ -88,13 +94,7 @@ const PaletteDetailDialog = ({
       "tritanopia",
     ];
     return Object.fromEntries(
-      types.map((type) => [
-        type,
-        paletteDist(palette.colors, type).reduce(
-          (min, d) => Math.min(min, d),
-          Infinity,
-        ),
-      ]),
+      types.map((type) => [type, minDist(palette.colors, type)]),
     ) as Record<SimulationType, number>;
   }, [palette.colors]);
 
@@ -272,7 +272,14 @@ const PaletteDetailDialog = ({
           <div>
             <h3 className="text-lg font-semibold mt-8 mb-4">Colorblindness</h3>
 
-            <ColorblindCheck colors={palette.colors} />
+            <ColorblindCheck
+              colors={palette.colors}
+              minDist={Math.min(
+                minDists.protanopia,
+                minDists.deuteranopia,
+                minDists.tritanopia,
+              )}
+            />
 
             <Tabs
               defaultValue="achromatopsia"

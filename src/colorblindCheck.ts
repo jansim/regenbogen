@@ -283,30 +283,16 @@ export const paletteCheck = (
 // Tableau 10 or ColorBrewer's Set1 / Set2 / Dark2 / Paired clearly fail.
 export const COLORBLIND_FRIENDLY_MIN_DIST = 6.4;
 
-export interface ColorblindScore {
-  // Minimal distance between any two colors with normal vision
-  normal: number;
-  // Minimal distance between any two colors under each CVD simulation
-  deuteranopia: number;
-  protanopia: number;
-  tritanopia: number;
-  // Minimal distance across all CVD simulations
-  cvd: number;
-}
+// Minimal distance between any two colors of a palette under a simulation
+export const minDist = (
+  colors: string[],
+  type: CvdType | "achromatopsia",
+): number => summarise(paletteDist(colors, type)).min;
 
-// Compact score used for filtering palettes
-export const colorblindScore = (colors: string[]): ColorblindScore => {
-  const [normal, deuteranopia, protanopia, tritanopia] = cvdTypes.map((cvd) =>
-    colors.length < 2 ? Infinity : summarise(paletteDist(colors, cvd)).min,
-  );
-  return {
-    normal,
-    deuteranopia,
-    protanopia,
-    tritanopia,
-    cvd: Math.min(deuteranopia, protanopia, tritanopia),
-  };
-};
+// Whether a minimal distance counts as colorblind friendly. Distances are
+// rounded to one decimal, matching the precomputed scores in the data.
+export const isFriendlyDist = (dist: number) =>
+  Math.round(dist * 10) >= Math.round(COLORBLIND_FRIENDLY_MIN_DIST * 10);
 
 // The two most similar colors of a palette under a given simulation
 export const closestPair = (
@@ -325,7 +311,8 @@ export const closestPair = (
   return best;
 };
 
-export const isColorblindFriendly = (
-  score: ColorblindScore,
-  minDist = COLORBLIND_FRIENDLY_MIN_DIST,
-) => score.cvd >= minDist;
+// Whether a palette is colorblind friendly, based on its precomputed score
+// (`cvd`: minimal distance under deuteranopia, protanopia and tritanopia,
+// times 10, see R/extract_palettes.R)
+export const isColorblindFriendly = (cvd?: number) =>
+  cvd !== undefined && isFriendlyDist(cvd / 10);
