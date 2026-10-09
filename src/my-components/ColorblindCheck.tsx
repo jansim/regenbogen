@@ -86,7 +86,9 @@ const ColorblindCheck = ({
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
         <span className="flex items-center gap-1.5 font-medium">
           <ColorblindIndicator friendly={friendly} minDist={minDist} />
-          {friendly ? "Colorblind friendly" : "Not colorblind friendly"}
+          {friendly
+            ? "Likely colorblind friendly"
+            : "Potentially not colorblind friendly"}
         </span>
         <button
           onClick={() => setShowDetails(!showDetails)}

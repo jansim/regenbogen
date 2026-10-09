@@ -22,7 +22,9 @@ const ColorblindIndicator = ({
       <span
         className="inline-flex items-center"
         aria-label={
-          friendly ? "Colorblind friendly" : "Not colorblind friendly"
+          friendly
+            ? "Likely colorblind friendly"
+            : "Potentially not colorblind friendly"
         }
       >
         {friendly ? (
@@ -34,17 +36,19 @@ const ColorblindIndicator = ({
     </TooltipTrigger>
     <TooltipContent className="max-w-xs font-normal">
       <p className="font-semibold">
-        {friendly ? "Colorblind friendly" : "Not colorblind friendly"}
+        {friendly
+          ? "Likely colorblind friendly"
+          : "Potentially not colorblind friendly"}
       </p>
       <p className="text-gray-500">
         {friendly
-          ? "All colors stay distinguishable"
-          : "Some colors are hard to tell apart"}{" "}
+          ? "All colors should stay distinguishable"
+          : "Some colors may be hard to tell apart"}{" "}
         with simulated deuteranopia, protanopia and tritanopia
         {minDist !== undefined && (
           <>
             {" "}
-            (closest colors: ΔE {minDist.toFixed(1)}, needs ≥{" "}
+            (closest colors: ΔE {minDist.toFixed(1)}, rule of thumb: ≥{" "}
             {COLORBLIND_FRIENDLY_MIN_DIST})
           </>
         )}
