@@ -8,11 +8,46 @@ import { Button } from "@/components/ui/button";
 import { Check, Copy, ChevronRight, Github } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Plot from "./Plot";
 import { hexToRgb, simulateColorBlindnessArray } from "@/colorBlindness";
 import ColorblindPreview from "./ColorBlindPreview";
+import ColorblindCheck from "./ColorblindCheck";
 import { generateCodePython, generateCodeR } from "@/codeGeneration";
+import {
+  isFriendlyDist,
+  minDist,
+  type SimulationType,
+} from "@/colorblindCheck";
+import ColorblindIndicator from "./ColorblindIndicator";
+
+// Label for a colorblindness tab, incl. the minimum color difference
+const SimulationTabLabel = ({
+  name,
+  minDist,
+  checked = true,
+}: {
+  name: string;
+  minDist: number;
+  // Whether this form of colorblindness counts towards colorblind friendliness
+  checked?: boolean;
+}) => (
+  <span className="flex flex-col items-center leading-tight">
+    <span>{name}</span>
+    {Number.isFinite(minDist) && (
+      <span className="flex items-center gap-0.5 text-xs font-mono text-gray-500">
+        ΔE {minDist.toFixed(1)}
+        {checked && (
+          <ColorblindIndicator
+            friendly={isFriendlyDist(minDist)}
+            minDist={minDist}
+            className="w-3.5 h-3.5"
+          />
+        )}
+      </span>
+    )}
+  </span>
+);
 
 const defaultPalette = {
   package: "awtools",
@@ -49,6 +84,19 @@ const PaletteDetailDialog = ({
   const [selectedView, setSelectedView] = useState("none");
 
   const plotTypes = ["bar", "line", "scatter", "area", "boxplot", "map"];
+
+  // Minimum color difference per form of colorblindness
+  const minDists = useMemo(() => {
+    const types: SimulationType[] = [
+      "achromatopsia",
+      "protanopia",
+      "deuteranopia",
+      "tritanopia",
+    ];
+    return Object.fromEntries(
+      types.map((type) => [type, minDist(palette.colors, type)]),
+    ) as Record<SimulationType, number>;
+  }, [palette.colors]);
 
   const [copiedCodeExample, setCopiedCodeExample] = useState<string | null>(
     null,
@@ -224,6 +272,15 @@ const PaletteDetailDialog = ({
           <div>
             <h3 className="text-lg font-semibold mt-8 mb-4">Colorblindness</h3>
 
+            <ColorblindCheck
+              colors={palette.colors}
+              minDist={Math.min(
+                minDists.protanopia,
+                minDists.deuteranopia,
+                minDists.tritanopia,
+              )}
+            />
+
             <Tabs
               defaultValue="achromatopsia"
               value={selectedView}
@@ -234,16 +291,29 @@ const PaletteDetailDialog = ({
                   None
                 </TabsTrigger>
                 <TabsTrigger value="achromatopsia" className="flex-1">
-                  Achromatopsia
+                  <SimulationTabLabel
+                    name="Achromatopsia"
+                    minDist={minDists.achromatopsia}
+                    checked={false}
+                  />
                 </TabsTrigger>
                 <TabsTrigger value="protanopia" className="flex-1">
-                  Protanopia
+                  <SimulationTabLabel
+                    name="Protanopia"
+                    minDist={minDists.protanopia}
+                  />
                 </TabsTrigger>
                 <TabsTrigger value="deuteranopia" className="flex-1">
-                  Deuteranopia
+                  <SimulationTabLabel
+                    name="Deuteranopia"
+                    minDist={minDists.deuteranopia}
+                  />
                 </TabsTrigger>
                 <TabsTrigger value="tritanopia" className="flex-1">
-                  Tritanopia
+                  <SimulationTabLabel
+                    name="Tritanopia"
+                    minDist={minDists.tritanopia}
+                  />
                 </TabsTrigger>
               </TabsList>
 

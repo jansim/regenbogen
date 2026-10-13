@@ -47,6 +47,20 @@ palettes_d <- rbind(
   palettes_d_extra
 )
 
+# Colorblind safety: minimal color difference (CIEDE2000) between any two
+# colors under simulated deuteranopia, protanopia and tritanopia, stored as an
+# integer (delta E * 10). The frontend implements the same check
+# (src/colorblindCheck.ts) to show detailed scores.
+palettes_d <- palettes_d %>%
+  rowwise() %>%
+  mutate(
+    cvd = if (length(colors) < 2) NA_integer_ else {
+      check <- colorblindcheck::palette_check(colors)
+      as.integer(round(min(check$min_dist[check$name != "normal"]) * 10))
+    }
+  ) %>%
+  ungroup()
+
 palettes_d %>%
   jsonlite::write_json("src/data/palettes_d.json")
 palettes_d
