@@ -61,8 +61,34 @@ palettes_d <- palettes_d %>%
   ) %>%
   ungroup()
 
-palettes_d %>%
-  jsonlite::write_json("src/data/palettes_d.json")
+# Write palettes in a compact format to keep the website's download small
+# (see src/data/loadPalettes.ts for decoding):
+# {
+#   "<package>": {
+#     "gh": "<github repo>" | null, "cran": 0 | 1, "pltr": 0 | 1,
+#     "palettes": [
+#       ["<palette>", "<type: q / d / s>", "<colors as one hex string>", <cvd>]
+#     ]
+#   }
+# }
+palettes_compact <- lapply(split(palettes_d, palettes_d$package), function(pkg) {
+  list(
+    gh = pkg$gh[[1]],
+    cran = as.integer(pkg$cran[[1]]),
+    pltr = as.integer(pkg$pltr[[1]]),
+    palettes = lapply(seq_len(nrow(pkg)), function(i) {
+      list(
+        pkg$palette[[i]],
+        substr(pkg$type[[i]], 1, 1),
+        paste(substring(pkg$colors[[i]], 2), collapse = ""),
+        pkg$cvd[[i]]
+      )
+    })
+  )
+})
+
+palettes_compact %>%
+  jsonlite::write_json("src/data/palettes.json", auto_unbox = TRUE, na = "null")
 palettes_d
 
 # TODO: Add these as well
