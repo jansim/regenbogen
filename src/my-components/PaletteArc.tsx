@@ -103,9 +103,8 @@ const PaletteArc = ({ width = 50, arcWidth = 10 }) => {
 
   return (
     <svg
-      width={width}
-      height={height}
-      className="select-none"
+      viewBox={`0 0 ${width} ${height}`}
+      className="select-none w-full h-auto overflow-visible"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

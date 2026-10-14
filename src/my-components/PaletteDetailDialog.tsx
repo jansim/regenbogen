@@ -135,9 +135,9 @@ const PaletteDetailDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl overflow-auto sm:w-[95vw] max-h-[100vh] sm:max-h-[95vh]">
+      <DialogContent className="max-w-4xl overflow-auto p-4 sm:p-6 sm:w-[95vw] max-h-[100dvh] sm:max-h-[95vh]">
         <DialogHeader>
-          <DialogTitle className="text-xl md:text-3xl">
+          <DialogTitle className="text-xl md:text-3xl text-left pr-6 break-words">
             <span className="text-gray-400 font-light">
               {palette.package}::
             </span>
@@ -149,7 +149,7 @@ const PaletteDetailDialog = ({
           <div className="space-y-4">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div className="space-y-2 w-full">
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                <div className="flex flex-wrap items-center gap-4">
                   <div className="flex flex-wrap items-center gap-4">
                     {palette.gh && (
                       <a
@@ -235,9 +235,9 @@ const PaletteDetailDialog = ({
               {palette.colors.map((color, index) => (
                 <div
                   key={`color-${index}`}
-                  className="flex flex-col md:flex-row items-center p-2 rounded-lg hover:bg-gray-50 gap-2"
+                  className="flex items-center p-2 rounded-lg hover:bg-gray-50 gap-2"
                 >
-                  <div className="flex gap-2 flex-1 w-full">
+                  <div className="flex gap-2 flex-1 min-w-0">
                     <div
                       className="w-12 h-12 rounded-md shrink-0"
                       style={{ backgroundColor: color }}
@@ -253,7 +253,7 @@ const PaletteDetailDialog = ({
                     variant="ghost"
                     size="sm"
                     onClick={() => copyToClipboard(color, index)}
-                    className="w-full md:w-24"
+                    className="shrink-0 md:w-24"
                   >
                     {copiedIndex === index ? (
                       <Check className="w-4 h-4 text-green-500" />

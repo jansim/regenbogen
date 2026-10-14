@@ -196,24 +196,22 @@ const PaletteDisplay = ({ palettes, plotType }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="h-24" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="h-20 sm:h-24" />
 
         <div className="flex flex-wrap items-center gap-x-6 gap-y-4 mb-6 justify-center lg:justify-between">
           <Input
             placeholder="Search palettes..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-64"
+            className="w-full sm:w-64"
           />
-          <div className="flex flex-wrap">
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
-              Palette Type
-            </div>
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+            <div className="text-sm text-gray-500">Palette Type</div>
             <RadioGroup
               value={selectedType}
               onValueChange={setSelectedType}
-              className="flex mx-3 space-x-2"
+              className="flex flex-wrap justify-center gap-x-3 gap-y-2"
             >
               {paletteTypes.map((type) => (
                 <div key={type} className="flex items-center space-x-2">
@@ -228,7 +226,7 @@ const PaletteDisplay = ({ palettes, plotType }) => {
               ))}
             </RadioGroup>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <div className="flex items-center space-x-2">
               <Switch
                 id="colorblind-only"
@@ -347,8 +345,8 @@ const PaletteDisplay = ({ palettes, plotType }) => {
                   >
                     <Card className="overflow-hidden cursor-pointer hover:shadow-xl transition-shadow">
                       <CardHeader className="pt-4 pb-2">
-                        <div className="relative">
-                          <span className="text-sm text-gray-400 absolute top-1 right-0 flex items-center gap-1">
+                        <div className="flex flex-col-reverse gap-1 md:block md:relative">
+                          <span className="text-sm text-gray-400 md:absolute md:top-1 md:right-0 flex items-center gap-1">
                             &#123;{palette.package}&#125; • {palette.length} •{" "}
                             {typeAbbreviations[palette.type] ?? palette.type}
                             {palette.cvd !== undefined && (
@@ -362,7 +360,7 @@ const PaletteDisplay = ({ palettes, plotType }) => {
                               </>
                             )}
                           </span>
-                          <span className="text-xl text-gray-600 relative inline-block bg-white pr-3">
+                          <span className="text-xl text-gray-600 break-words md:relative md:inline-block md:bg-white md:pr-3">
                             {palette.palette}
                           </span>
                         </div>
