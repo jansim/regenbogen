@@ -32,7 +32,7 @@ const charts = [
 // Choose how palettes are previewed in the overview
 const PlotTypeSelect = ({ value, onValueChange }) => (
   <Select value={value} onValueChange={onValueChange}>
-    <SelectTrigger className="w-[150px]" aria-label="Preview type">
+    <SelectTrigger className="w-[120px] sm:w-[150px]" aria-label="Preview type">
       <SelectValue placeholder="Select plot type" />
     </SelectTrigger>
     <SelectContent>

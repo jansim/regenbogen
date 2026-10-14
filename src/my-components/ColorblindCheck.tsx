@@ -21,12 +21,12 @@ const ScoreTable = ({ colors }: { colors: string[] }) => {
     <Table className="text-sm">
       <TableHeader>
         <TableRow>
-          <TableHead>Vision</TableHead>
-          <TableHead className="text-right">Min ΔE</TableHead>
-          <TableHead className="text-right">Mean ΔE</TableHead>
-          <TableHead className="text-right">Max ΔE</TableHead>
+          <TableHead className="px-2 sm:px-4">Vision</TableHead>
+          <TableHead className="text-right px-2 sm:px-4">Min ΔE</TableHead>
+          <TableHead className="text-right px-2 sm:px-4">Mean ΔE</TableHead>
+          <TableHead className="text-right px-2 sm:px-4">Max ΔE</TableHead>
           <TableHead
-            className="text-right"
+            className="text-right px-2 sm:px-4"
             title="Number of color pairs that are at least as different as the two most similar colors with normal vision"
           >
             Distinguishable pairs
@@ -36,8 +36,10 @@ const ScoreTable = ({ colors }: { colors: string[] }) => {
       <TableBody>
         {check.map((row) => (
           <TableRow key={row.name}>
-            <TableCell className="capitalize py-2">{row.name}</TableCell>
-            <TableCell className="py-2">
+            <TableCell className="capitalize py-2 px-2 sm:px-4">
+              {row.name}
+            </TableCell>
+            <TableCell className="py-2 px-2 sm:px-4">
               <span className="flex items-center justify-end gap-1 font-mono">
                 {formatDist(row.min_dist)}
                 {row.name !== "normal" ? (
@@ -50,13 +52,13 @@ const ScoreTable = ({ colors }: { colors: string[] }) => {
                 )}
               </span>
             </TableCell>
-            <TableCell className="text-right font-mono py-2">
+            <TableCell className="text-right font-mono py-2 px-2 sm:px-4">
               {formatDist(row.mean_dist)}
             </TableCell>
-            <TableCell className="text-right font-mono py-2">
+            <TableCell className="text-right font-mono py-2 px-2 sm:px-4">
               {formatDist(row.max_dist)}
             </TableCell>
-            <TableCell className="text-right font-mono py-2">
+            <TableCell className="text-right font-mono py-2 px-2 sm:px-4">
               {row.ndcp} / {row.ncp}
             </TableCell>
           </TableRow>
