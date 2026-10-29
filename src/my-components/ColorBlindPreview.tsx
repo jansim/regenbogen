@@ -24,11 +24,6 @@ const ColorblindPreview = ({ colors, type }) => {
           </div>
         ))}
       </div>
-      {pair && (
-        <div className="text-sm text-gray-500">
-          Most similar colors (marked): {colors[pair.i]} and {colors[pair.j]}
-        </div>
-      )}
     </div>
   );
 };
